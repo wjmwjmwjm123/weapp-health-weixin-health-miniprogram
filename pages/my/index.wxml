@@ -1,0 +1,232 @@
+<t-toast id="t-toast" />
+
+<view class="my-page">
+  <image class="hero-bg" src="/static/bg_navbar.png" mode="widthFix" />
+
+  <view class="profile-card">
+    <view class="user-info">
+      <view class="avatar-shell" bindtap="{{isLoad ? 'onNavigateTo' : 'onLogin'}}">
+        <image wx:if="{{isLoad && personalInfo.image}}" src="{{personalInfo.image}}" mode="aspectFill" />
+        <view class="avatar-placeholder" wx:else>👤</view>
+      </view>
+      <view class="user-meta">
+        <view class="user-name">{{isLoad ? personalInfo.name : '未登录用户'}}</view>
+        <view class="user-desc">
+          {{isLoad ? personalInfo.city + ' · ' + personalInfo.star : '登录后同步微信头像、昵称与积分'}}
+        </view>
+        <view class="user-actions">
+          <view class="action-btn primary" bindtap="{{isLoad ? 'onNavigateTo' : 'onLogin'}}">
+            {{isLoad ? '编辑资料' : '微信快捷登录'}}
+          </view>
+          <view class="action-btn ghost" bindtap="onCheckPoints">积分记录</view>
+        </view>
+      </view>
+    </view>
+    <view class="profile-stats" wx:if="{{isLoad}}">
+      <view class="stat-item">
+        <view class="stat-label">当前积分</view>
+        <view class="stat-value">{{pointsPlaybook.total}}</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-label">公益累计（元）</view>
+        <view class="stat-value">{{pointsPlaybook.charityAmount}}</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-label">拯救小动物</view>
+        <view class="stat-value">{{pointsPlaybook.donatedAnimals}}只</view>
+      </view>
+    </view>
+    <view class="badge-showcase" wx:if="{{isLoad}}">
+      <view class="showcase-header">
+        <view class="showcase-title">我的成就</view>
+        <view class="showcase-edit" bindtap="onEditBadges">{{displayedBadges.length > 0 ? '编辑' : '去获取'}}</view>
+      </view>
+      <view class="showcase-badges">
+        <view 
+          class="showcase-badge-item {{item.unlocked ? '' : 'locked'}}" 
+          wx:for="{{displayedBadges}}" 
+          wx:key="id"
+          bindtap="onViewBadgeDetail"
+          data-id="{{item.id}}"
+        >
+          <view class="showcase-badge-icon-wrapper {{item.unlocked ? 'unlocked' : ''}}">
+            <view class="showcase-badge-icon">{{item.icon}}</view>
+          </view>
+          <view class="showcase-badge-name">{{item.name}}</view>
+          <view class="showcase-badge-desc">{{item.desc}}</view>
+        </view>
+        <view 
+          class="showcase-badge-item add-badge" 
+          wx:if="{{displayedBadges.length < 6}}"
+          bindtap="onEditBadges"
+        >
+          <view class="add-icon">+</view>
+          <view class="add-text">{{displayedBadges.length === 0 ? '添加成就' : '添加'}}</view>
+        </view>
+      </view>
+      <view class="showcase-empty" wx:if="{{displayedBadges.length === 0}}">
+        <view class="empty-text">还没有展示的成就，快去完成成就吧！</view>
+      </view>
+    </view>
+    <view class="profile-stats locked" wx:else>
+      <view class="stat-item single">
+        <view class="stat-label">登录后同步积分、公公益与课程数据</view>
+        <view class="login-link" bindtap="onLogin">去登录</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="module-card avatar-card" wx:if="{{isLoad}}">
+    <view class="module-header">
+      <view>
+        <view class="title">定制个人形象</view>
+        <view class="sub">结合 MBTI，生成专属卡通教练</view>
+      </view>
+      <view class="chip">{{mbtiProfile.type}}人格</view>
+    </view>
+    <view class="avatar-content">
+      <view class="avatar-figure">
+        <view class="figure-emoji">{{mbtiProfile.emoji}}</view>
+        <view class="figure-type">{{mbtiProfile.persona}}</view>
+        <view class="figure-tip">{{mbtiProfile.tip}}</view>
+      </view>
+      <view class="avatar-panel">
+        <view class="panel-text">
+          {{mbtiProfile.story}}
+        </view>
+        <view class="avatar-tags">
+          <view class="tag" wx:for="{{avatarThemes}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="avatar-actions">
+          <view class="ghost-btn" bindtap="onMBTITest">重新测一测</view>
+          <view class="primary-btn" bindtap="onCustomizeAvatar">生成形象</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="module-card points-card" wx:if="{{isLoad}}">
+    <view class="module-header">
+      <view>
+        <view class="title">积分公益体系</view>
+        <view class="sub">1积分=0.01元公益金</view>
+      </view>
+    </view>
+    <view class="points-summary">
+      <view class="summary-item">
+        <view class="summary-label">公益余额</view>
+        <view class="summary-value">{{pointsPlaybook.charity}}积分</view>
+      </view>
+      <view class="summary-item">
+        <view class="summary-label">本周增长</view>
+        <view class="summary-value">{{pointsPlaybook.weeklyGrowthText}}积分</view>
+      </view>
+      <view class="summary-item">
+        <view class="summary-label">排行榜</view>
+        <view class="summary-value">TOP {{pointsPlaybook.ranking}}</view>
+      </view>
+    </view>
+    <view class="section-title">积分获取</view>
+    <view class="playbook-list">
+      <view class="playbook-item" wx:for="{{pointsPlaybook.earnList}}" wx:key="title">
+        <view class="icon">{{item.icon}}</view>
+        <view class="info">
+          <view class="label">{{item.title}}</view>
+          <view class="desc">{{item.desc}}</view>
+        </view>
+        <view class="value">{{item.points}}</view>
+      </view>
+    </view>
+    <view class="section-title">积分兑换 / 公益捐赠</view>
+    <view class="redeem-grid">
+      <view class="redeem-item" wx:for="{{pointsPlaybook.redeemList}}" wx:key="title">
+        <view class="redeem-title">{{item.title}}</view>
+        <view class="redeem-desc">{{item.desc}}</view>
+        <view class="redeem-points">{{item.cost}}</view>
+      </view>
+    </view>
+    <view class="charity-panel">
+      <view class="charity-info">
+        <view class="charity-title">{{pointsPlaybook.charityProject.title}}</view>
+        <view class="charity-desc">{{pointsPlaybook.charityProject.desc}}</view>
+        <view class="charity-meta">每{{pointsPlaybook.charityProject.cost}}积分=1份物资</view>
+      </view>
+      <view class="charity-btn" bindtap="onDonate">立即捐赠</view>
+    </view>
+    <view class="idea-chips">
+      <view class="chip" wx:for="{{pointsPlaybook.playIdeas}}" wx:key="index">{{item}}</view>
+    </view>
+  </view>
+  <view class="module-card points-card locked-card" wx:else>
+    <view class="module-header">
+      <view class="title">积分公益体系</view>
+      <view class="sub">登录后查看签到、打卡等积分</view>
+    </view>
+    <view class="locked-tip">
+      <view>完成登录即可同步首页的积分数据，并参与公益捐赠、排行榜。</view>
+      <view class="primary-btn small" bindtap="onLogin">立即登录</view>
+    </view>
+  </view>
+
+  <view class="module-card community-card" wx:if="{{isLoad}}">
+    <view class="module-header">
+      <view class="title">圈子社交 & 公益直播</view>
+      <view class="sub">组队打卡 · 直播见证救助</view>
+    </view>
+    <view class="group-list">
+      <view class="group-item" wx:for="{{communityData.groups}}" wx:key="name" data-name="{{item.name}}" bindtap="onJoinGroup">
+        <view class="group-icon">{{item.icon}}</view>
+        <view class="group-info">
+          <view class="group-name">{{item.name}}</view>
+          <view class="group-desc">{{item.desc}}</view>
+        </view>
+        <view class="group-meta">{{item.members}}人 · {{item.status}}</view>
+      </view>
+    </view>
+    <view class="live-panel">
+      <view class="live-left">
+        <view class="live-title">{{communityData.live.title}}</view>
+        <view class="live-time">{{communityData.live.time}}</view>
+        <view class="live-desc">{{communityData.live.desc}}</view>
+      </view>
+      <view class="live-btn" bindtap="onWatchLive">{{communityData.live.action}}</view>
+    </view>
+  </view>
+
+  <view class="module-card recharge-card" wx:if="{{isLoad}}">
+    <view class="module-header">
+      <view class="title">充值中心</view>
+      <view class="sub">课程 · 食谱 · 设备一站购</view>
+    </view>
+    <view class="recharge-list">
+      <view class="recharge-item" wx:for="{{rechargeOptions}}" wx:key="title" data-title="{{item.title}}" bindtap="onRechargeOption">
+        <view class="recharge-info">
+          <view class="recharge-title">
+            <text class="tag" wx:if="{{item.tag}}">{{item.tag}}</text>
+            {{item.title}}
+          </view>
+          <view class="recharge-desc">{{item.desc}}</view>
+        </view>
+        <view class="recharge-price">￥{{item.price}}</view>
+      </view>
+    </view>
+    <view class="primary-btn full" bindtap="onRechargeCenter">前往充值</view>
+  </view>
+
+  <view class="module-card account-card">
+    <view class="module-header">
+      <view class="title">账号与服务</view>
+      <view class="sub">快速登录 · 资料管理 · 设置</view>
+    </view>
+    <view class="account-actions">
+      <view class="account-item" data-type="setting" bindtap="onGoSetting">
+        <view class="account-title">系统设置</view>
+        <view class="account-desc">缓存清理 · 通知开关 · 隐私管理</view>
+      </view>
+      <view class="account-item" data-type="service" bindtap="onContact">
+        <view class="account-title">联系客服</view>
+        <view class="account-desc">客服微信：Ksbsds-0 · 电话：15559219227</view>
+      </view>
+    </view>
+  </view>
+</view>

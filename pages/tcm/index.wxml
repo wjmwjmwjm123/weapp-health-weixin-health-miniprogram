@@ -1,0 +1,113 @@
+<view class="tcm-page" enable-flex="true">
+  <scroll-view class="tcm-scroll" scroll-y="true" enable-flex="true">
+    <view class="hero-card" bindtap="onHeroTap">
+      <view class="hero-left">
+        <view class="hero-label">本地中医接入</view>
+        <view class="hero-title">{{summary.city}} · {{summary.focus}}</view>
+        <view class="hero-meta">
+          <text>积分 {{summary.points}}</text>
+          <text>上次测评：{{summary.lastCheck}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <view>
+          <view class="section-title">今日体质洞察</view>
+          <view class="section-subtitle">基于计划与日常记录实时更新</view>
+        </view>
+      </view>
+      <view class="diagnosis-card">
+        <view class="diagnosis-summary">
+          <view class="summary-title">{{diagnosis.constitution}}</view>
+          <view class="summary-desc">{{diagnosis.advice}}</view>
+        </view>
+        <view class="focus-tags">
+          <text class="focus-tag" wx:for="{{focusTips}}" wx:key="index">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">快速操作</view>
+        <view class="section-subtitle">常用功能一键直达</view>
+      </view>
+      <view class="quick-grid">
+        <view
+          class="quick-item"
+          wx:for="{{quickActions}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          data-url="{{item.url}}"
+          bindtap="onActionTap"
+        >
+          <view class="quick-icon">{{item.icon}}</view>
+          <view class="quick-title">{{item.title}}</view>
+          <view class="quick-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{dailyRecipe}}">
+      <view class="section-header">
+        <view class="section-title">当日药膳</view>
+        <view class="section-subtitle">从药膳教学中为你挑选</view>
+      </view>
+      <view class="recipe-card" bindtap="onDailyRecipeTap">
+        <view class="recipe-head">
+          <view class="recipe-title">{{dailyRecipe.title}}</view>
+          <view class="recipe-tag">{{dailyRecipe.timing}} · {{dailyRecipe.season}}</view>
+        </view>
+        <view class="recipe-focus">{{dailyRecipe.focus}}</view>
+        <view class="recipe-ingredients">主要食材：{{dailyRecipe.ingredients.join('、')}}</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">药膳教学</view>
+        <view class="section-subtitle">更多配伍与烹煮技巧</view>
+      </view>
+      <view class="teaching-card" bindtap="onTeachingTap">
+        <view class="teaching-title">收录 {{medicatedLessons.length}} 个方子</view>
+        <view class="teaching-desc">季节调护 · 体质餐单 · 烹煮技巧</view>
+        <view class="teaching-link">进入药膳课堂 ›</view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{lifeTips.length}}">
+      <view class="section-header">
+        <view class="section-title">生活常识</view>
+        <view class="section-subtitle">体质养护、作息、运动建议</view>
+      </view>
+      <block wx:for="{{lifeTips}}" wx:key="id">
+        <view class="life-item" data-index="{{index}}" bindtap="onLifeTipTap">
+          <view class="life-title">{{item.title}}</view>
+          <view class="life-summary">{{item.summary}}</view>
+        </view>
+      </block>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">中医知识快报</view>
+        <view class="section-subtitle">每日3分钟精读</view>
+      </view>
+      <block wx:for="{{knowledgeFeeds}}" wx:key="id">
+        <view class="feed-item" data-id="{{item.id}}" bindtap="onKnowledgeTap">
+          <view class="feed-title">{{item.title}}</view>
+          <view class="feed-meta">
+            <text class="feed-tag">{{item.tag}}</text>
+            <text>{{item.time}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+
+
+    <view class="page-bottom-placeholder" />
+  </scroll-view>
+</view>
+

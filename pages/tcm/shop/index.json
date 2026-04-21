@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "中药商城",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon"
+  }
+}
+

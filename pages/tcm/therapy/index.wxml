@@ -1,0 +1,40 @@
+<view class="therapy-container">
+  <view class="therapy-section">
+    <view class="section-title">穴位按摩</view>
+    <view class="acupoint-list">
+      <view wx:for="{{acupoints}}" wx:key="id" class="acupoint-item">
+        <view class="acupoint-header">
+          <view class="acupoint-name">{{item.name}}</view>
+          <view class="acupoint-location">📍 {{item.location}}</view>
+        </view>
+        <view class="acupoint-content">
+          <view class="acupoint-effect">
+            <text class="label">功效：</text>
+            <text class="value">{{item.effect}}</text>
+          </view>
+          <view class="acupoint-method">
+            <text class="label">方法：</text>
+            <text class="value">{{item.method}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="therapy-section">
+    <view class="section-title">拉伸运动</view>
+    <view class="exercise-list">
+      <view wx:for="{{exercises}}" wx:key="id" class="exercise-item">
+        <view class="exercise-title">{{item.title}}</view>
+        <view class="exercise-desc">{{item.desc}}</view>
+        <view class="exercise-steps">
+          <view wx:for="{{item.steps}}" wx:key="*this" wx:for-index="idx" class="step">
+            <text class="step-dot">{{idx + 1}}</text>
+            <text class="step-text">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+

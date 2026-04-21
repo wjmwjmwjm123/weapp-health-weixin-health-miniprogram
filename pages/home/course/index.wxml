@@ -1,0 +1,81 @@
+<view class="course-container">
+  <view class="course-tabs">
+    <t-tabs value="{{currentTab}}" bind:change="onTabChange">
+      <t-tab-panel label="推荐" value="0"></t-tab-panel>
+      <t-tab-panel label="初级" value="1"></t-tab-panel>
+      <t-tab-panel label="中级" value="2"></t-tab-panel>
+      <t-tab-panel label="高级" value="3"></t-tab-panel>
+    </t-tabs>
+  </view>
+
+  <!-- 场景筛选 -->
+  <view class="scene-filter">
+    <view
+      class="scene-item {{scene === 'all' ? 'active' : ''}}"
+      data-scene="all"
+      bindtap="onSceneChange"
+    >
+      全部
+    </view>
+    <view
+      class="scene-item {{scene === 'home' ? 'active' : ''}}"
+      data-scene="home"
+      bindtap="onSceneChange"
+    >
+      居家
+    </view>
+    <view
+      class="scene-item {{scene === 'office' ? 'active' : ''}}"
+      data-scene="office"
+      bindtap="onSceneChange"
+    >
+      办公室
+    </view>
+    <view
+      class="scene-item {{scene === 'outdoor' ? 'active' : ''}}"
+      data-scene="outdoor"
+      bindtap="onSceneChange"
+    >
+      户外
+    </view>
+  </view>
+
+  <!-- 课程列表 -->
+  <view class="course-list">
+    <view
+      wx:for="{{filteredCourses}}"
+      wx:key="id"
+      class="course-item"
+      data-id="{{item.id}}"
+      bindtap="onCourseTap"
+    >
+      <view class="course-image">
+        <view class="course-placeholder">🎥</view>
+        <view wx:if="{{item.completed}}" class="course-completed">✓ 已完成</view>
+      </view>
+      <view class="course-info">
+        <view class="course-title">{{item.title}}</view>
+        <view class="course-desc">{{item.desc}}</view>
+        <view class="course-meta">
+          <text class="meta-item">⏱ {{item.duration}}分钟</text>
+          <text class="meta-item">🔥 {{item.calories}}卡</text>
+          <text class="meta-item">💰 {{item.points}}积分</text>
+        </view>
+        <view class="course-tags">
+          <text class="tag difficulty-{{item.difficulty}}">
+            {{item.difficulty === 'beginner' ? '初级' : item.difficulty === 'intermediate' ? '中级' : '高级'}}
+          </text>
+          <text class="tag scene-{{item.scene}}">
+            {{item.scene === 'home' ? '居家' : item.scene === 'office' ? '办公室' : '户外'}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日任务提示 -->
+  <view class="task-tip" wx:if="{{todayTask.completed < todayTask.total}}">
+    <text>💡 今日还有 {{todayTask.total - todayTask.completed}} 个任务未完成，完成后可获得积分！</text>
+  </view>
+</view>
+

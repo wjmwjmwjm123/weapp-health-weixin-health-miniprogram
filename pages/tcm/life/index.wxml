@@ -1,0 +1,13 @@
+<view class="life-detail-page">
+  <view class="life-header">
+    <view class="life-title">{{detail.title}}</view>
+    <view class="life-summary">{{detail.summary}}</view>
+  </view>
+
+  <view class="life-section" wx:for="{{detail.sections}}" wx:key="title">
+    <view class="section-title">{{item.title}}</view>
+    <view class="section-content">{{item.content}}</view>
+  </view>
+</view>
+
+

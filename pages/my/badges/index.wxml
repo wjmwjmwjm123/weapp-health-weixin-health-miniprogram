@@ -1,0 +1,107 @@
+<view class="badges-page">
+  <view class="header-card" wx:if="{{!selectMode}}">
+    <view class="header-info">
+      <view>
+        <view class="header-title">成就等级</view>
+        <view class="header-desc">当前成就点数 {{totalPoints}}</view>
+      </view>
+      <view class="header-level">Lv.{{level}}</view>
+    </view>
+    <view class="level-progress">
+      <view class="progress-text">距离下一级还需 {{nextLevelPoints - totalPoints}} 点</view>
+      <t-progress percentage="{{levelProgress}}" color="#fff" track-color="rgba(255,255,255,0.3)" />
+    </view>
+  </view>
+
+  <view class="category-tabs" wx:if="{{!selectMode}}">
+    <view 
+      class="tab-item {{currentCategory === 'all' ? 'active' : ''}}" 
+      bindtap="onSwitchCategory" 
+      data-id="all"
+    >全部</view>
+    <view 
+      class="tab-item {{currentCategory === item.id ? 'active' : ''}}" 
+      wx:for="{{categories}}" 
+      wx:key="id"
+      bindtap="onSwitchCategory" 
+      data-id="{{item.id}}"
+    >
+      <text class="tab-icon">{{item.icon}}</text>
+      <text>{{item.name}}</text>
+    </view>
+  </view>
+
+  <view class="select-mode-tip" wx:if="{{selectMode}}">
+    <text>选择要展示的成就（最多6个）</text>
+    <text class="select-count">{{selectedBadgeIds.length}}/6</text>
+  </view>
+
+  <view class="badges-grid">
+    <view 
+      class="badge-item {{item.unlocked ? 'unlocked' : ''}} {{selectMode && selectedBadgeIds.includes(item.id) ? 'selected' : ''}}" 
+      data-rarity="{{item.rarity}}"
+      wx:for="{{displayBadges}}" 
+      wx:key="id"
+      bindtap="onShowDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="badge-icon-wrapper">
+        <view class="badge-icon">{{item.icon}}</view>
+        <view class="badge-status" wx:if="{{!item.unlocked}}">🔒</view>
+        <view class="badge-selected-mark" wx:if="{{selectMode && selectedBadgeIds.includes(item.id)}}">✓</view>
+      </view>
+      <view class="badge-name">{{item.name}}</view>
+      <view class="badge-progress-mini" wx:if="{{!item.unlocked}}">
+        {{item.progress}}/{{item.target}}
+      </view>
+      <view class="badge-rarity" wx:if="{{item.rarity}}">
+        <text class="rarity-tag rarity-{{item.rarity}}">{{item.rarity === 'common' ? '普通' : item.rarity === 'rare' ? '稀有' : item.rarity === 'epic' ? '史诗' : '传说'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="select-actions" wx:if="{{selectMode}}">
+    <view class="btn-cancel" bindtap="onCancelSelect">取消</view>
+    <view class="btn-confirm" bindtap="onConfirmSelect">确定</view>
+  </view>
+
+  <t-popup visible="{{showDetail}}" bind:visible-change="onCloseDetail" placement="center">
+    <view class="badge-detail-popup" wx:if="{{selectedBadge}}">
+      <view class="detail-icon-wrapper {{selectedBadge.unlocked ? 'unlocked' : ''}}">
+        <view class="detail-icon">{{selectedBadge.icon}}</view>
+      </view>
+      <view class="detail-name">{{selectedBadge.name}}</view>
+      <view class="detail-desc">{{selectedBadge.desc}}</view>
+      
+      <view class="detail-unlock-condition" wx:if="{{!selectedBadge.unlocked}}">
+        <view class="condition-title">解锁条件</view>
+        <view class="condition-text">需要完成：{{selectedBadge.desc}}</view>
+        <view class="condition-target">目标：{{selectedBadge.target}}</view>
+      </view>
+      
+      <view class="detail-message" wx:if="{{selectedBadge.message}}">
+        {{selectedBadge.message}}
+      </view>
+      
+      <view class="detail-progress-card">
+        <view class="progress-header">
+          <text>当前进度</text>
+          <text class="progress-val">{{selectedBadge.progress}} / {{selectedBadge.target}}</text>
+        </view>
+        <t-progress percentage="{{selectedBadge.percent}}" />
+        <view class="reward-info">
+          <t-icon name="gift" size="16px" color="#ff4d4f" />
+          <text>奖励：{{selectedBadge.rewardPoints}} 积分</text>
+        </view>
+      </view>
+
+      <view class="detail-status {{selectedBadge.unlocked ? 'completed' : ''}}">
+        {{selectedBadge.unlocked ? '✨ 已解锁' : '进行中'}}
+      </view>
+      
+      <view class="detail-time" wx:if="{{selectedBadge.unlocked && selectedBadge.unlockTime}}">
+        解锁于 {{selectedBadge.unlockTime}}
+      </view>
+    </view>
+  </t-popup>
+</view>

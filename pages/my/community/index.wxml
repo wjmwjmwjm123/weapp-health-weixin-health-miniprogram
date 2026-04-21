@@ -1,0 +1,82 @@
+<view class="community-page">
+  <view class="community-header">
+    <view class="header-bg"></view>
+    <view class="header-content">
+      <view class="header-icon">{{group.icon}}</view>
+      <view class="header-info">
+        <view class="header-title">{{group.name}}</view>
+        <view class="header-desc">{{group.desc}}</view>
+        <view class="header-meta">
+          <text>{{group.members}} 成员</text>
+          <text class="divider">·</text>
+          <text>{{group.posts}} 帖子</text>
+        </view>
+      </view>
+      <view class="join-btn {{isJoined ? 'joined' : ''}}" bindtap="onToggleJoin">
+        {{isJoined ? '已加入' : '加入圈子'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="post-list">
+    <block wx:for="{{posts}}" wx:key="id">
+      <view class="post-card">
+        <view class="post-header">
+          <t-avatar image="{{item.avatar}}" size="small" />
+          <view class="user-info">
+            <view class="user-name">{{item.userName}}</view>
+            <view class="post-time">{{item.time}}</view>
+          </view>
+        </view>
+        <view class="post-content">{{item.content}}</view>
+        <view class="post-images" wx:if="{{item.images && item.images.length}}">
+          <image 
+            wx:for="{{item.images}}" 
+            wx:for-item="img" 
+            wx:key="*this" 
+            src="{{img}}" 
+            mode="aspectFill" 
+            class="post-img {{item.images.length === 1 ? 'single' : ''}}"
+            bindtap="onPreviewImage"
+            data-current="{{img}}"
+            data-urls="{{item.images}}"
+          />
+        </view>
+        <view class="post-footer">
+          <view class="action-item" bindtap="onLikePost" data-id="{{item.id}}">
+            <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="20px" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
+            <text class="{{item.isLiked ? 'active' : ''}}">{{item.likes}}</text>
+          </view>
+          <view class="action-item">
+            <t-icon name="chat" size="20px" color="#999" />
+            <text>{{item.comments}}</text>
+          </view>
+          <view class="action-item">
+            <t-icon name="share" size="20px" color="#999" />
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <t-fab icon="add" bind:click="onShowPublish" aria-label="发布帖子" />
+
+  <t-popup visible="{{showPublish}}" bind:visible-change="onClosePublish" placement="bottom">
+    <view class="publish-popup">
+      <view class="popup-header">
+        <view class="btn-cancel" bindtap="onClosePublish">取消</view>
+        <view class="popup-title">发布帖子</view>
+        <view class="btn-publish" bindtap="onPublishPost">发布</view>
+      </view>
+      <view class="popup-content">
+        <t-textarea 
+          value="{{publishContent}}" 
+          placeholder="分享你的运动心得..." 
+          autosize 
+          maxlength="500" 
+          bind:change="onContentChange"
+        />
+      </view>
+    </view>
+  </t-popup>
+</view>

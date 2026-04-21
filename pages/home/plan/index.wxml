@@ -1,0 +1,114 @@
+<view class="plan-container">
+  <view wx:if="{{!showPlan}}" class="plan-form">
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-item">
+        <view class="form-label">身高 (cm)</view>
+        <input
+          class="form-input"
+          type="digit"
+          placeholder="请输入身高"
+          value="{{formData.height}}"
+          bindinput="onHeightInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">体重 (kg)</view>
+        <input
+          class="form-input"
+          type="digit"
+          placeholder="请输入体重"
+          value="{{formData.weight}}"
+          bindinput="onWeightInput"
+        />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">目标体重 (kg)</view>
+        <input
+          class="form-input"
+          type="digit"
+          placeholder="请输入目标体重"
+          value="{{formData.targetWeight}}"
+          bindinput="onTargetWeightInput"
+        />
+      </view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">饮食偏好</view>
+      <t-radio-group value="{{formData.dietPreference}}" bind:change="onDietPreferenceChange">
+        <t-radio
+          wx:for="{{dietPreferences}}"
+          wx:key="*this"
+          value="{{item}}"
+          label="{{item}}"
+        />
+      </t-radio-group>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">运动水平</view>
+      <t-radio-group value="{{formData.exerciseLevel}}" bind:change="onExerciseLevelChange">
+        <t-radio
+          wx:for="{{exerciseLevels}}"
+          wx:key="*this"
+          value="{{item}}"
+          label="{{item}}"
+        />
+      </t-radio-group>
+    </view>
+
+    <view class="form-submit">
+      <t-button theme="primary" size="large" block bindtap="generatePlan">
+        生成减脂计划
+      </t-button>
+    </view>
+  </view>
+
+  <view wx:else class="plan-result">
+    <view class="plan-header">
+      <view class="plan-title">您的个性化减脂计划</view>
+      <view class="plan-edit" bindtap="editPlan">编辑</view>
+    </view>
+
+    <view class="plan-card">
+      <view class="plan-section">
+        <view class="plan-label">当前BMI</view>
+        <view class="plan-value">{{plan.bmi}} ({{plan.currentStatus}})</view>
+      </view>
+      <view class="plan-section">
+        <view class="plan-label">目标体重</view>
+        <view class="plan-value">{{plan.targetWeight}} kg</view>
+      </view>
+      <view class="plan-section">
+        <view class="plan-label">每日建议摄入</view>
+        <view class="plan-value">{{plan.targetCalories}} 卡</view>
+      </view>
+    </view>
+
+    <view class="plan-card">
+      <view class="plan-label">运动强度建议</view>
+      <view class="plan-text">{{plan.exerciseIntensity}}</view>
+    </view>
+
+    <view class="plan-card">
+      <view class="plan-label">饮食建议</view>
+      <view class="plan-text">{{plan.dietSuggestion}}</view>
+    </view>
+
+    <view class="plan-card">
+      <view class="plan-label">本周运动计划</view>
+      <view class="weekly-plan">
+        <view wx:for="{{plan.weeklyPlan}}" wx:key="day" class="weekly-item">
+          <view class="weekly-day">{{item.day}}</view>
+          <view class="weekly-exercise">{{item.exercise}}</view>
+          <view class="weekly-calories">{{item.calories}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+

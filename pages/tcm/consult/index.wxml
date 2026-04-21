@@ -1,0 +1,57 @@
+<view class="consult-container">
+  <view class="consult-messages">
+    <view wx:for="{{messages}}" wx:key="id" class="message-item message-{{item.type}}">
+      <view class="message-avatar">
+        <view wx:if="{{item.type === 'user'}}" class="avatar user-avatar">我</view>
+        <view wx:elif="{{item.type === 'ai'}}" class="avatar ai-avatar">AI</view>
+        <view wx:else class="avatar system-avatar">系统</view>
+      </view>
+      <view class="message-content">
+        <view class="message-text">{{item.content}}</view>
+        <view class="message-time">{{item.time}}</view>
+      </view>
+    </view>
+    <!-- AI回复加载提示 -->
+    <view wx:if="{{loading}}" class="message-item message-ai">
+      <view class="message-avatar">
+        <view class="avatar ai-avatar">AI</view>
+      </view>
+      <view class="message-content">
+        <view class="loading-text">
+          <text>正在思考中</text>
+          <text class="loading-dot">...</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="quick-questions" wx:if="{{messages.length <= 1}}">
+    <view class="quick-title">常见问题</view>
+    <view class="quick-list">
+      <view
+        wx:for="{{quickQuestions}}"
+        wx:key="*this"
+        class="quick-item"
+        data-question="{{item}}"
+        bindtap="onQuickQuestion"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <view class="consult-input">
+    <input
+      class="input-box"
+      placeholder="请输入您的问题..."
+      value="{{inputValue}}"
+      bindinput="onInput"
+      confirm-type="send"
+      bindconfirm="onSend"
+    />
+    <view class="send-btn" bindtap="onSend">
+      <t-icon name="send" size="40rpx" />
+    </view>
+  </view>
+</view>
+

@@ -1,0 +1,79 @@
+@import '/variable.less';
+
+.record-container {
+  min-height: 100vh;
+  background-color: @bg-color;
+
+  .record-form {
+    padding: 24rpx;
+
+    .record-section {
+      background-color: #fff;
+      border-radius: 16rpx;
+      padding: 32rpx;
+      margin-bottom: 24rpx;
+
+      .section-title {
+        font-size: 32rpx;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 24rpx;
+        padding-bottom: 16rpx;
+        border-bottom: 1rpx solid #f0f0f0;
+      }
+
+      .form-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32rpx;
+        padding-bottom: 24rpx;
+        border-bottom: 1rpx solid #f0f0f0;
+
+        &:last-child {
+          margin-bottom: 0;
+          padding-bottom: 0;
+          border-bottom: none;
+        }
+
+        .form-label {
+          font-size: 28rpx;
+          color: #666;
+        }
+
+        .form-input {
+          flex: 1;
+          text-align: right;
+          font-size: 28rpx;
+          color: #333;
+          margin-left: 24rpx;
+        }
+      }
+    }
+  }
+
+  .history-list {
+    padding: 24rpx;
+
+    .history-item {
+      background-color: #fff;
+      border-radius: 16rpx;
+      padding: 32rpx;
+      margin-bottom: 24rpx;
+
+      .history-date {
+        font-size: 32rpx;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 16rpx;
+      }
+
+      .history-data {
+        font-size: 28rpx;
+        color: #666;
+        line-height: 1.8;
+      }
+    }
+  }
+}
+

@@ -1,0 +1,43 @@
+<view class="shop-container">
+  <view class="shop-categories">
+    <view
+      wx:for="{{categories}}"
+      wx:key="id"
+      class="category-item {{item.active ? 'active' : ''}}"
+      data-name="{{item.name}}"
+      bindtap="onCategoryTap"
+    >
+      {{item.name}}
+    </view>
+  </view>
+
+  <view class="shop-products">
+    <view
+      wx:for="{{filteredProducts}}"
+      wx:key="id"
+      class="product-item"
+      data-id="{{item.id}}"
+      bindtap="onProductTap"
+    >
+      <view class="product-image">
+        <view class="product-placeholder">🌿</view>
+      </view>
+      <view class="product-info">
+        <view class="product-name">{{item.name}}</view>
+        <view class="product-desc">{{item.desc}}</view>
+        <view class="product-price">
+          <text class="current-price">¥{{item.price}}</text>
+          <text class="original-price">¥{{item.originalPrice}}</text>
+        </view>
+      </view>
+      <view class="product-action">
+        <view class="add-cart-btn">加入购物车</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="shop-tip">
+    <text>💡 提示：此商城为演示功能，仅用于展示</text>
+  </view>
+</view>
+

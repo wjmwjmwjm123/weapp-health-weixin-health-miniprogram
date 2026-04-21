@@ -1,0 +1,85 @@
+@import '/variable.less';
+
+.points-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #667eea 0%, @bg-color 100%);
+  padding-bottom: 40rpx;
+
+  .points-header {
+    padding: 48rpx 32rpx;
+    text-align: center;
+    color: #fff;
+
+    .points-icon {
+      font-size: 80rpx;
+      margin-bottom: 24rpx;
+    }
+
+    .points-value {
+      font-size: 72rpx;
+      font-weight: 600;
+      margin-bottom: 16rpx;
+    }
+
+    .points-label {
+      font-size: 28rpx;
+      opacity: 0.9;
+    }
+  }
+
+  .points-history {
+    padding: 24rpx 32rpx;
+
+    .history-title {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 24rpx;
+    }
+
+    .history-list {
+      .history-item {
+        display: flex;
+        align-items: center;
+        background-color: #fff;
+        border-radius: 16rpx;
+        padding: 24rpx;
+        margin-bottom: 16rpx;
+
+        .history-icon {
+          font-size: 40rpx;
+          margin-right: 24rpx;
+        }
+
+        .history-info {
+          flex: 1;
+
+          .history-desc {
+            font-size: 28rpx;
+            color: #333;
+            margin-bottom: 8rpx;
+          }
+
+          .history-time {
+            font-size: 24rpx;
+            color: #999;
+          }
+        }
+
+        .history-amount {
+          font-size: 32rpx;
+          font-weight: 600;
+
+          &.earn {
+            color: #43e97b;
+          }
+
+          &.deduct {
+            color: #ff4757;
+          }
+        }
+      }
+    }
+  }
+}
+

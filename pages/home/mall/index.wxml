@@ -1,0 +1,42 @@
+<view class="mall-container">
+  <t-tabs value="{{currentTab}}" bind:change="onTabChange">
+    <t-tab-panel label="视频课程" value="{{0}}"></t-tab-panel>
+    <t-tab-panel label="运动设备" value="{{1}}"></t-tab-panel>
+    <t-tab-panel label="中医商品" value="{{2}}"></t-tab-panel>
+  </t-tabs>
+
+  <view class="product-list">
+    <view
+      wx:for="{{products}}"
+      wx:key="id"
+      class="product-item"
+      data-product="{{item}}"
+      bindtap="onAddToCart"
+    >
+      <view class="product-image">
+        <view class="product-placeholder">{{item.type === 'course' ? '🎥' : item.type === 'equipment' ? '🏋️' : '🌿'}}</view>
+      </view>
+      <view class="product-info">
+        <view class="product-name">{{item.name}}</view>
+        <view class="product-desc">{{item.desc}}</view>
+        <view class="product-price">
+          <text class="current-price">¥{{item.price}}</text>
+          <text class="original-price">¥{{item.originalPrice}}</text>
+        </view>
+      </view>
+      <view class="product-action">
+        <view class="add-to-cart-btn">加入购物车</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 购物车图标 -->
+  <view class="cart-icon" bindtap="onGoToCart">
+    <t-icon name="shopping-cart" size="48rpx" color="#fff"></t-icon>
+    <view class="cart-count" wx:if="{{cartItemCount > 0}}">{{cartItemCount}}</view>
+  </view>
+
+  <view class="mall-tip">
+    <text>💡 提示：此商城为演示功能，仅用于展示</text>
+  </view>
+</view>

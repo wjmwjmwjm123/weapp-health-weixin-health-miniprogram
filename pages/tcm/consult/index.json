@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "医生咨询",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon"
+  }
+}
+

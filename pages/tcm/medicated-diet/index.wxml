@@ -1,0 +1,47 @@
+<view class="diet-container">
+  <t-tabs value="{{currentTab}}" bind:change="onTabChange">
+    <t-tab-panel label="药膳食谱" value="0">
+      <view class="recipe-list">
+        <view wx:for="{{recipes}}" wx:key="id" class="recipe-item">
+          <view class="recipe-header">
+            <view class="recipe-title">{{item.title}}</view>
+            <view class="recipe-desc">{{item.desc}}</view>
+          </view>
+          <view class="recipe-content">
+            <view class="recipe-section">
+              <view class="section-title">功效：</view>
+              <view class="section-text">{{item.effect}}</view>
+            </view>
+            <view class="recipe-section">
+              <view class="section-title">材料：</view>
+              <view class="ingredients">
+                <text wx:for="{{item.ingredients}}" wx:key="*this" class="ingredient-tag">{{item}}</text>
+              </view>
+            </view>
+            <view class="recipe-section">
+              <view class="section-title">制作步骤：</view>
+              <view class="steps">
+                <view wx:for="{{item.steps}}" wx:key="*this" wx:for-index="idx" class="step-item">
+                  <text class="step-num">{{idx + 1}}</text>
+                  <text class="step-text">{{item}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </t-tab-panel>
+    <t-tab-panel label="中药认识" value="1">
+      <view class="herb-list">
+        <view wx:for="{{herbs}}" wx:key="id" class="herb-item">
+          <view class="herb-icon">{{item.name}}</view>
+          <view class="herb-info">
+            <view class="herb-name">{{item.name}}</view>
+            <view class="herb-desc">{{item.desc}}</view>
+          </view>
+        </view>
+      </view>
+    </t-tab-panel>
+  </t-tabs>
+</view>
+

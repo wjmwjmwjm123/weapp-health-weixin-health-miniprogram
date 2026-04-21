@@ -1,0 +1,213 @@
+<view class="home-container">
+  <!-- 顶部 Dashboard 区域 -->
+  <view class="dashboard-area">
+    <!-- 用户信息行 -->
+    <view class="user-header">
+      <view class="user-info">
+        <t-avatar class="user-avatar" icon="user" size="medium" />
+        <view class="user-text">
+          <view class="greeting">Hi, 保持健康</view>
+          <view class="points-tag" bindtap="onPointsTap">
+            <t-icon name="money-circle" size="28rpx" />
+            <text>{{points}} 积分</text>
+          </view>
+        </view>
+      </view>
+      <view class="header-actions">
+        <view class="icon-btn" bindtap="getWeChatSteps">
+          <t-icon name="refresh" size="40rpx" color="#fff" />
+            </view>
+          </view>
+        </view>
+
+    <!-- 核心步数展示 -->
+    <view class="steps-core">
+      <view class="steps-ring-wrapper">
+        <!-- 使用 TDesign 环形进度条 -->
+        <t-progress 
+          theme="circle"
+          percentage="{{stepData.stepsProgress}}" 
+          stroke-width="12" 
+          color="{{progressColor}}" 
+          track-color="rgba(255,255,255,0.3)"
+          label=""
+        />
+        <view class="steps-content">
+          <view class="steps-val">{{stepData.currentSteps}}</view>
+          <view class="steps-label">今日步数</view>
+        </view>
+      </view>
+
+      <view class="steps-metrics">
+        <view class="metric-item">
+          <text class="val">{{stepData.predictedCalories}}</text>
+          <text class="lbl">千卡消耗</text>
+        </view>
+        <view class="metric-divider"></view>
+        <view class="metric-item">
+          <text class="val">{{stepData.targetSteps}}</text>
+          <text class="lbl">目标步数</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 手动记录按钮（悬浮在 Dashboard 右下角） -->
+    <view class="record-btn" bindtap="setManualSteps">
+      <t-icon name="edit" size="32rpx" color="#fff" />
+      <text>记步</text>
+    </view>
+  </view>
+
+  <!-- 页面主体内容（向上重叠 Dashboard） -->
+  <view class="page-body">
+    
+    <!-- 金刚区：功能入口 -->
+    <view class="nav-card">
+          <view
+        class="nav-item" 
+        wx:for="{{modules}}" 
+        wx:key="id" 
+        bindtap="onModuleTap"
+        data-url="{{item.url}}"
+          >
+        <view class="nav-icon-box icon-{{item.id}}">
+          <t-icon name="{{item.icon}}" size="48rpx" color="#fff" />
+        </view>
+        <text class="nav-title">{{item.title}}</text>
+      </view>
+    </view>
+
+    <!-- 数据双卡片 -->
+    <view class="data-row">
+      <!-- 身体数据 -->
+      <view class="data-card body-data" bindtap="onModuleTap" data-url="/pages/home/plan/index">
+        <view class="card-head">
+          <text class="title">身体状态</text>
+          <t-icon name="chevron-right" size="32rpx" color="#ccc" />
+  </view>
+        <view class="card-body center" wx:if="{{bodyData.weight > 0}}">
+          <view class="big-num">
+            {{bodyData.weight}}<text class="unit">kg</text>
+    </view>
+          <t-tag 
+            size="small" 
+            variant="light" 
+            shape="round"
+            theme="{{bodyData.bmiStatus === '正常' ? 'success' : bodyData.bmiStatus === '偏瘦' ? 'primary' : 'warning'}}"
+          >BMI {{bodyData.bmi}} {{bodyData.bmiStatus}}</t-tag>
+      </view>
+        <view class="card-body empty" wx:else>
+          <text>去设置</text>
+        </view>
+      </view>
+
+      <!-- 今日概览 -->
+      <view class="data-card overview-data" bindtap="onModuleTap" data-url="/pages/home/record/index">
+        <view class="card-head">
+          <text class="title">今日摄入</text>
+          <t-icon name="chevron-right" size="32rpx" color="#ccc" />
+        </view>
+        <view class="card-body">
+      <view class="overview-item">
+            <text class="lbl">饮食</text>
+            <text class="val">{{todayData.caloriesIn}}</text>
+      </view>
+      <view class="overview-item">
+            <text class="lbl">运动</text>
+            <text class="val">{{todayData.caloriesOut}}</text>
+      </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日任务 -->
+    <view class="section-card">
+      <view class="section-head">
+        <text class="title">今日任务</text>
+        <text class="subtitle">{{todayTask.completed}}/{{todayTask.total}}</text>
+      </view>
+      <view class="task-list">
+        <view class="task-item {{item.done ? 'done' : ''}}" wx:for="{{taskList}}" wx:key="id">
+          <view class="check-icon">
+            <t-icon name="{{item.done ? 'check-circle-filled' : 'circle'}}" size="44rpx" color="{{item.done ? '#07c160' : '#e0e0e0'}}" />
+    </view>
+        <view class="task-info">
+            <text class="task-title">{{item.title}}</text>
+            <text class="task-desc">{{item.desc}}</text>
+        </view>
+          <t-button 
+            wx:if="{{!item.done && item.action}}" 
+            theme="primary" 
+            variant="outline" 
+            size="small"
+            shape="round"
+            data-action="{{item.action}}"
+            bindtap="onTaskAction"
+          >去完成</t-button>
+      </view>
+    </view>
+  </view>
+
+    <!-- 生理期（女性健康） -->
+    <view class="section-card period-card" bindtap="onRecordPeriod">
+      <view class="period-row">
+        <view class="period-icon">
+          <t-icon name="heart" size="40rpx" color="#ff758f" />
+        </view>
+        <view class="period-info">
+          <block wx:if="{{periodData.nextPeriodStart}}">
+            <block wx:if="{{periodData.isPeriod}}">
+              <text class="main-text">生理期进行中</text>
+              <text class="sub-text">第 {{periodData.lastPeriodDuration || 1}} 天，注意休息</text>
+            </block>
+            <block wx:else>
+              <text class="main-text">距离下次还有 {{periodData.daysUntilNext}} 天</text>
+              <text class="sub-text">预计 {{periodData.nextPeriodStart}} 开始</text>
+            </block>
+          </block>
+          <block wx:else>
+            <text class="main-text">开启女性健康记录</text>
+            <text class="sub-text">智能预测生理周期</text>
+          </block>
+        </view>
+        <view class="period-action">
+          <text>{{periodData.isPeriod ? '记录' : '查看'}}</text>
+          <t-icon name="chevron-right" size="32rpx" color="#ccc" />
+        </view>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- 弹窗保持不变 -->
+  <view class="period-modal" wx:if="{{showPeriodModal}}" catchtap="onClosePeriodModal">
+    <view class="period-modal-content" catchtap="">
+      <view class="period-modal-header">
+        <view class="period-modal-title">添加生理期记录</view>
+        <view class="period-modal-close" bindtap="onClosePeriodModal">✕</view>
+      </view>
+      <view class="period-modal-body">
+        <view class="period-form-item">
+          <view class="period-form-label">开始日期</view>
+          <picker mode="date" value="{{periodStartDate}}" bindchange="onPeriodStartDateChange" catchtap="">
+            <view class="period-form-input" catchtap="">
+              {{periodStartDate || '请选择开始日期'}}
+            </view>
+          </picker>
+        </view>
+        <view class="period-form-item">
+          <view class="period-form-label">结束日期</view>
+          <picker mode="date" value="{{periodEndDate}}" bindchange="onPeriodEndDateChange" catchtap="">
+            <view class="period-form-input" catchtap="">
+              {{periodEndDate || '请选择结束日期'}}
+            </view>
+          </picker>
+        </view>
+      </view>
+      <view class="period-modal-footer">
+        <view class="period-modal-btn cancel" bindtap="onClosePeriodModal">取消</view>
+        <view class="period-modal-btn confirm" bindtap="onSavePeriodRecord">{{editingRecordIndex >= 0 ? '更新' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

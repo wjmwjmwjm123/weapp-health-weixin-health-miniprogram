@@ -1,0 +1,117 @@
+@import '/variable.less';
+
+.therapy-container {
+  min-height: 100vh;
+  background-color: @bg-color;
+  padding: 24rpx;
+
+  .therapy-section {
+    margin-bottom: 48rpx;
+
+    .section-title {
+      font-size: 36rpx;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 24rpx;
+      padding-left: 16rpx;
+      border-left: 6rpx solid #667eea;
+    }
+
+    .acupoint-list {
+      .acupoint-item {
+        background-color: #fff;
+        border-radius: 16rpx;
+        padding: 32rpx;
+        margin-bottom: 24rpx;
+
+        .acupoint-header {
+          margin-bottom: 20rpx;
+          padding-bottom: 20rpx;
+          border-bottom: 1rpx solid #f0f0f0;
+
+          .acupoint-name {
+            font-size: 36rpx;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12rpx;
+          }
+
+          .acupoint-location {
+            font-size: 28rpx;
+            color: #666;
+          }
+        }
+
+        .acupoint-content {
+          .acupoint-effect,
+          .acupoint-method {
+            margin-bottom: 16rpx;
+            font-size: 28rpx;
+            line-height: 1.6;
+
+            .label {
+              font-weight: 600;
+              color: #333;
+            }
+
+            .value {
+              color: #666;
+            }
+          }
+        }
+      }
+    }
+
+    .exercise-list {
+      .exercise-item {
+        background-color: #fff;
+        border-radius: 16rpx;
+        padding: 32rpx;
+        margin-bottom: 24rpx;
+
+        .exercise-title {
+          font-size: 32rpx;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin-bottom: 12rpx;
+        }
+
+        .exercise-desc {
+          font-size: 28rpx;
+          color: #666;
+          margin-bottom: 24rpx;
+        }
+
+        .exercise-steps {
+          .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16rpx;
+
+            .step-dot {
+              width: 36rpx;
+              height: 36rpx;
+              background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+              color: #fff;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 24rpx;
+              margin-right: 16rpx;
+              flex-shrink: 0;
+            }
+
+            .step-text {
+              flex: 1;
+              font-size: 28rpx;
+              color: #666;
+              line-height: 1.6;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,321 @@
+@import '/variable.less';
+
+.travel-container {
+  min-height: 100vh;
+  background-color: @bg-color;
+
+  .travel-content {
+    padding: 32rpx 24rpx 120rpx;
+    box-sizing: border-box;
+  }
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #4f9dff, #62d5c8);
+  color: #fff;
+  padding: 32rpx;
+  border-radius: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+
+  .hero-info {
+    max-width: 70%;
+
+    .hero-label {
+      font-size: 26rpx;
+      opacity: 0.9;
+    }
+
+    .hero-title {
+      font-size: 40rpx;
+      font-weight: 600;
+      margin: 12rpx 0;
+    }
+
+    .hero-meta {
+      font-size: 24rpx;
+      opacity: 0.9;
+    }
+  }
+
+  .hero-action {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 12rpx 24rpx;
+    border-radius: 999rpx;
+    font-size: 24rpx;
+  }
+}
+
+.section {
+  margin-bottom: 32rpx;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16rpx;
+
+    .section-title {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: #1f1f1f;
+    }
+
+    .section-subtitle {
+      font-size: 24rpx;
+      color: #999;
+    }
+  }
+}
+
+.ai-card,
+.route-card,
+.challenge-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  box-shadow: 0 8rpx 32rpx rgba(54, 97, 255, 0.08);
+  margin-bottom: 24rpx;
+}
+
+.ai-card {
+  .ai-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12rpx;
+  }
+
+  .ai-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .ai-meta {
+    font-size: 24rpx;
+    color: #666;
+    display: flex;
+    gap: 24rpx;
+    margin-bottom: 16rpx;
+  }
+
+  .ai-desc {
+    font-size: 26rpx;
+    color: #3a3a3a;
+    line-height: 1.6;
+    margin-bottom: 16rpx;
+  }
+
+  .ai-poi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12rpx;
+    margin-bottom: 16rpx;
+
+    .poi-chip {
+      background: #f1f5ff;
+      color: #2b6bf3;
+      padding: 8rpx 16rpx;
+      border-radius: 999rpx;
+      font-size: 22rpx;
+    }
+  }
+}
+
+.route-card {
+  &.favorite-card {
+    border: 2rpx solid #ff4d4f;
+    background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+  }
+
+  .route-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20rpx;
+
+    .route-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex: 1;
+      gap: 16rpx;
+    }
+
+    .route-title {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: #121212;
+    }
+
+    .route-subtitle {
+      font-size: 26rpx;
+      color: #666;
+      margin-top: 8rpx;
+    }
+
+    .route-tags {
+      display: flex;
+      flex-direction: column;
+      gap: 12rpx;
+      align-items: flex-end;
+    }
+  }
+
+  .route-stats {
+    display: flex;
+    justify-content: space-between;
+    margin: 24rpx 0;
+
+    .stat {
+      text-align: center;
+
+      .value {
+        font-size: 30rpx;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+
+      .label {
+        font-size: 22rpx;
+        color: #999;
+      }
+    }
+  }
+
+  .route-desc {
+    font-size: 26rpx;
+    color: #4f4f4f;
+    line-height: 1.5;
+    margin-bottom: 20rpx;
+  }
+}
+
+.challenge-card {
+  border: 1rpx solid #f0f0f0;
+
+  &.joined {
+    border-color: #2b6bf3;
+  }
+
+  &.completed {
+    border-color: #2fc25b;
+    background: #f6ffed;
+  }
+
+  .challenge-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16rpx;
+    margin-bottom: 12rpx;
+
+    .challenge-title {
+      font-size: 30rpx;
+      font-weight: 600;
+    }
+  }
+
+  .challenge-desc {
+    font-size: 26rpx;
+    color: #4f4f4f;
+    line-height: 1.5;
+    margin-bottom: 12rpx;
+  }
+
+  .challenge-meta {
+    font-size: 24rpx;
+    color: #666;
+    display: flex;
+    gap: 24rpx;
+    margin-bottom: 16rpx;
+  }
+}
+
+.route-actions,
+.challenge-actions,
+.card-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.btn {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 0;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  border: 1rpx solid #d9e1ff;
+  color: #2b6bf3;
+
+  &.primary {
+    background: #2b6bf3;
+    color: #fff;
+    border-color: transparent;
+  }
+
+  &.ghost {
+    background: #f4f7ff;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+  }
+}
+
+.tag {
+  background: #f5f6f7;
+  color: #666;
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+
+  &.compact {
+    font-size: 20rpx;
+  }
+}
+
+.status-label {
+  font-size: 24rpx;
+  color: #2fc25b;
+  padding: 12rpx 0;
+}
+
+.favorite-btn {
+  flex-shrink: 0;
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+
+  .favorite-icon {
+    font-size: 32rpx;
+    line-height: 1;
+  }
+
+  &.favorited {
+    background: rgba(255, 77, 79, 0.1);
+    animation: favoritePulse 0.3s ease;
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes favoritePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

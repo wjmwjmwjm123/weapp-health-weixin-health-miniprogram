@@ -1,0 +1,12 @@
+<t-tab-bar value="{{ value }}" theme="tag" split="{{ false }}" bind:change="handleChange">
+  <t-tab-bar-item icon="home" value="home">首页</t-tab-bar-item>
+  <t-tab-bar-item icon="tcm" value="tcm">
+    <image slot="icon" src="/static/icon_tcm.jpg" class="custom-icon" mode="aspectFit" />
+    <text class="custom-text">中医</text>
+  </t-tab-bar-item>
+  <t-tab-bar-item icon="travel" value="travel">
+    <image slot="icon" src="/static/icon_travel.jpg" class="custom-icon" mode="aspectFit" />
+    <text class="custom-text">旅游</text>
+  </t-tab-bar-item>
+  <t-tab-bar-item icon="user" value="my">我的</t-tab-bar-item>
+</t-tab-bar>

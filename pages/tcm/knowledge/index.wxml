@@ -1,0 +1,39 @@
+<view class="article-container" wx:if="{{article}}">
+  <view class="article-header">
+    <view class="article-title">{{article.title}}</view>
+    <view class="article-meta">
+      <text class="article-tag">{{article.tag}}</text>
+      <text class="article-time">{{article.time}}</text>
+    </view>
+  </view>
+
+  <view class="article-content">
+    <block wx:for="{{article.content}}" wx:key="index">
+      <!-- 文本段落 -->
+      <view wx:if="{{item.type === 'text'}}" class="content-text">
+        <text>{{item.text}}</text>
+      </view>
+
+      <!-- 小标题 -->
+      <view wx:elif="{{item.type === 'header'}}" class="content-header">
+        <text>{{item.text}}</text>
+      </view>
+
+      <!-- 列表 -->
+      <view wx:elif="{{item.type === 'list'}}" class="content-list">
+        <view wx:for="{{item.items}}" wx:for-item="listItem" wx:key="*this" class="list-item">
+          <text class="list-dot">•</text>
+          <text class="list-text">{{listItem}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="article-footer">
+    <view class="footer-tip">以上内容仅供参考，如有不适请及时就医</view>
+  </view>
+</view>
+
+<view wx:else class="loading-container">
+  <text>加载中...</text>
+</view>

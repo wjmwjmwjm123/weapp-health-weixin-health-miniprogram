@@ -1,0 +1,128 @@
+@import '/variable.less';
+
+.mall-container {
+  min-height: 100vh;
+  background-color: @bg-color;
+  padding-bottom: 120rpx;
+
+  .product-list {
+    padding: 24rpx;
+
+    .product-item {
+      display: flex;
+      background-color: #fff;
+      border-radius: 16rpx;
+      padding: 24rpx;
+      margin-bottom: 24rpx;
+      box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+
+      .product-image {
+        width: 200rpx;
+        height: 200rpx;
+        background-color: #f5f7fa;
+        border-radius: 12rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 24rpx;
+        flex-shrink: 0;
+
+        .product-placeholder {
+          font-size: 80rpx;
+        }
+      }
+
+      .product-info {
+        flex: 1;
+
+        .product-name {
+          font-size: 32rpx;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin-bottom: 12rpx;
+        }
+
+        .product-desc {
+          font-size: 24rpx;
+          color: #666;
+          margin-bottom: 16rpx;
+        }
+
+        .product-price {
+          display: flex;
+          align-items: center;
+
+          .current-price {
+            font-size: 36rpx;
+            font-weight: 600;
+            color: #ff4757;
+            margin-right: 16rpx;
+          }
+
+          .original-price {
+            font-size: 24rpx;
+            color: #999;
+            text-decoration: line-through;
+          }
+        }
+      }
+
+      .product-action {
+        display: flex;
+        align-items: flex-end;
+
+        .add-to-cart-btn {
+          padding: 12rpx 32rpx;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: #fff;
+          border-radius: 20rpx;
+          font-size: 28rpx;
+        }
+      }
+    }
+  }
+
+  .mall-tip {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24rpx;
+    background-color: #fff;
+    border-top: 1rpx solid #f0f0f0;
+    text-align: center;
+    font-size: 24rpx;
+    color: #999;
+  }
+
+  /* 购物车图标样式 */
+  .cart-icon {
+    position: fixed;
+    bottom: 120rpx;
+    right: 40rpx;
+    width: 80rpx;
+    height: 80rpx;
+    background: linear-gradient(135deg, #ff6b6b, #ffa502);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4rpx 20rpx rgba(255, 107, 107, 0.4);
+    z-index: 999;
+
+    .cart-count {
+      position: absolute;
+      top: -10rpx;
+      right: -10rpx;
+      background-color: #ff4757;
+      color: white;
+      font-size: 20rpx;
+      width: 36rpx;
+      height: 36rpx;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

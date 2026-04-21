@@ -1,0 +1,202 @@
+<view class="travel-container">
+  <t-pull-down-refresh
+    value="{{loading}}"
+    bind:refresh="onRefresh"
+    loadingTexts="{{['下拉刷新', '松手刷新', '正在刷新', '刷新完成']}}"
+  >
+    <view class="travel-content">
+      <view class="hero-card">
+        <view class="hero-info">
+          <view class="hero-label">本地化轻旅行</view>
+          <view class="hero-title">{{location.city}} · {{location.tagline}}</view>
+          <view class="hero-meta">
+            今日可用路线 {{recommendedRoutes.length}} 条 · 积累 {{summary.totalDistance}} km
+          </view>
+        </view>
+        <view
+          class="hero-action"
+          bindtap="onGenerateAIRoute"
+        >
+          <text wx:if="{{!aiGenerating}}">调用AI生成</text>
+          <text wx:else>生成中...</text>
+        </view>
+      </view>
+
+      <view class="section" wx:if="{{aiRoute}}">
+        <view class="section-header">
+          <view class="section-title">AI定制路线</view>
+          <view class="section-subtitle">{{aiRoute.generatedAt}}</view>
+        </view>
+        <view class="ai-card">
+          <view class="ai-header-row">
+            <view class="ai-title">{{aiRoute.title}}</view>
+            <view 
+              class="favorite-btn {{aiRoute.favorited ? 'favorited' : ''}}"
+              data-id="{{aiRoute.id}}"
+              bindtap="onToggleFavorite"
+            >
+              <text class="favorite-icon">{{aiRoute.favorited ? '❤️' : '🤍'}}</text>
+            </view>
+          </view>
+          <view class="ai-meta">
+            <text>{{aiRoute.distance}} km</text>
+            <text>≈ {{aiRoute.calories}} kcal</text>
+            <text>{{aiRoute.mode}}</text>
+          </view>
+          <view class="ai-desc">{{aiRoute.storyline}}</view>
+          <view class="ai-poi" wx:if="{{aiRoute.poiList && aiRoute.poiList.length}}">
+            <text class="poi-chip" wx:for="{{aiRoute.poiList}}" wx:key="index">{{item}}</text>
+          </view>
+          <view class="card-actions">
+            <view class="btn primary" data-id="{{aiRoute.id}}" bindtap="onStartRoute">体验路线</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section" wx:if="{{favoriteRoutes.length > 0}}">
+        <view class="section-header">
+          <view class="section-title">我的收藏</view>
+          <view class="section-subtitle">已收藏 {{favoriteRoutes.length}} 条路线</view>
+        </view>
+        <block wx:for="{{favoriteRoutes}}" wx:key="id">
+          <view class="route-card favorite-card">
+            <view class="route-header">
+              <view class="route-title-row">
+                <view>
+                  <view class="route-title">{{item.title}}</view>
+                  <view class="route-subtitle">{{item.highlight}}</view>
+                </view>
+                <view 
+                  class="favorite-btn favorited"
+                  data-id="{{item.id}}"
+                  bindtap="onToggleFavorite"
+                >
+                  <text class="favorite-icon">❤️</text>
+                </view>
+              </view>
+              <view class="route-tags">
+                <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+              </view>
+            </view>
+            <view class="route-stats">
+              <view class="stat">
+                <view class="value">{{item.distance}} km</view>
+                <view class="label">里程</view>
+              </view>
+              <view class="stat">
+                <view class="value">{{item.calories}} kcal</view>
+                <view class="label">预计消耗</view>
+              </view>
+              <view class="stat">
+                <view class="value">{{item.duration}} min</view>
+                <view class="label">用时</view>
+              </view>
+            </view>
+            <view class="route-desc">{{item.storyline}}</view>
+            <view class="route-actions">
+              <view class="btn ghost" data-id="{{item.id}}" bindtap="onStartRoute">体验路线</view>
+            </view>
+          </view>
+        </block>
+      </view>
+
+      <view class="section">
+        <view class="section-header">
+          <view class="section-title">本地路线推荐</view>
+          <view class="section-subtitle">徒步 / 骑行 / 森林公园</view>
+        </view>
+        <block wx:for="{{recommendedRoutes}}" wx:key="id">
+          <view class="route-card">
+            <view class="route-header">
+              <view class="route-title-row">
+                <view>
+                  <view class="route-title">{{item.title}}</view>
+                  <view class="route-subtitle">{{item.highlight}}</view>
+                </view>
+                <view 
+                  class="favorite-btn {{item.favorited ? 'favorited' : ''}}"
+                  data-id="{{item.id}}"
+                  bindtap="onToggleFavorite"
+                >
+                  <text class="favorite-icon">{{item.favorited ? '❤️' : '🤍'}}</text>
+                </view>
+              </view>
+              <view class="route-tags">
+                <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+              </view>
+            </view>
+            <view class="route-stats">
+              <view class="stat">
+                <view class="value">{{item.distance}} km</view>
+                <view class="label">里程</view>
+              </view>
+              <view class="stat">
+                <view class="value">{{item.calories}} kcal</view>
+                <view class="label">预计消耗</view>
+              </view>
+              <view class="stat">
+                <view class="value">{{item.duration}} min</view>
+                <view class="label">用时</view>
+              </view>
+            </view>
+            <view class="route-desc">{{item.storyline}}</view>
+            <view class="route-actions">
+              <view class="btn ghost" data-id="{{item.id}}" bindtap="onStartRoute">体验路线</view>
+              <view
+                class="btn primary {{item.saved ? 'disabled' : ''}}"
+                data-id="{{item.id}}"
+                bindtap="onSaveRoute"
+              >
+                {{item.saved ? '已加入计划' : '加入计划'}}
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+
+      <view class="section">
+        <view class="section-header">
+          <view class="section-title">主题挑战</view>
+          <view class="section-subtitle">完成即可获得额外积分</view>
+        </view>
+        <block wx:for="{{challenges}}" wx:key="id">
+          <view class="challenge-card {{item.status}}">
+            <view class="challenge-header">
+              <view class="challenge-title">{{item.title}}</view>
+              <view class="challenge-tags">
+                <text class="tag compact" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+              </view>
+            </view>
+            <view class="challenge-desc">{{item.desc}}</view>
+            <view class="challenge-meta">
+              <text>距离 {{item.distance}} km</text>
+              <text>奖励 +{{item.reward}} 积分</text>
+            </view>
+            <view class="challenge-actions">
+              <view
+                class="btn ghost"
+                wx:if="{{item.status === 'idle'}}"
+                data-id="{{item.id}}"
+                bindtap="onJoinChallenge"
+              >
+                加入挑战
+              </view>
+              <view
+                class="btn primary"
+                wx:elif="{{item.status === 'joined'}}"
+                data-id="{{item.id}}"
+                bindtap="onCompleteChallenge"
+              >
+                完成打卡
+              </view>
+              <view class="status-label" wx:elif="{{item.status === 'completed'}}">已完成</view>
+            </view>
+          </view>
+        </block>
+      </view>
+
+      <t-loading wx:if="{{loading}}" theme="dots" size="40rpx" text="加载中..." />
+    </view>
+  </t-pull-down-refresh>
+</view>
+

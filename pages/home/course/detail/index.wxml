@@ -1,0 +1,49 @@
+<view class="course-detail-container" wx:if="{{course}}">
+  <view class="course-video">
+    <view class="video-placeholder">
+      <view class="play-icon">▶</view>
+      <text>视频播放区域</text>
+    </view>
+    <view class="video-info">
+      <view class="video-title">{{course.title}}</view>
+      <view class="video-desc">{{course.desc}}</view>
+    </view>
+  </view>
+
+  <view class="course-info">
+    <view class="info-item">
+      <text class="info-label">时长</text>
+      <text class="info-value">{{course.duration / 60}}分钟</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">消耗卡路里</text>
+      <text class="info-value">{{course.calories}}卡</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">完成奖励</text>
+      <text class="info-value">💰 {{course.points}}积分</text>
+    </view>
+  </view>
+
+  <view class="course-actions">
+    <t-button
+      wx:if="{{!completed}}"
+      theme="primary"
+      size="large"
+      block
+      bindtap="onComplete"
+    >
+      完成课程
+    </t-button>
+    <t-button
+      wx:else
+      theme="default"
+      size="large"
+      block
+      disabled
+    >
+      已完成
+    </t-button>
+  </view>
+</view>
+

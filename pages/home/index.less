@@ -1,0 +1,514 @@
+@import '/variable.less';
+
+.home-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+  padding-bottom: calc(@tab-bar-height + 40rpx);
+  box-sizing: border-box;
+}
+
+// 顶部 Dashboard (含头部和步数)
+.dashboard-area {
+  background: linear-gradient(180deg, #E6F0FF 0%, #F7F8FA 100%);
+  padding: calc(env(safe-area-inset-top) + 24rpx) 32rpx 140rpx; // 底部留白给主体内容
+  position: relative;
+  
+  // 装饰背景圆
+  &::before {
+    content: '';
+    position: absolute;
+    top: -100rpx;
+    right: -100rpx;
+    width: 400rpx;
+    height: 400rpx;
+    background: radial-gradient(circle, rgba(102,126,234,0.1) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  // 用户信息行
+  .user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48rpx;
+    position: relative;
+    z-index: 1;
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      
+      .user-avatar {
+        border: 4rpx solid #fff;
+        box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+        margin-right: 24rpx;
+      }
+      
+      .user-text {
+        .greeting {
+          font-size: 36rpx;
+          font-weight: 700;
+          color: #1a1a1a;
+          margin-bottom: 8rpx;
+        }
+        
+        .points-tag {
+          display: inline-flex;
+          align-items: center;
+          background: #fff;
+          padding: 6rpx 16rpx;
+          border-radius: 24rpx;
+          box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.03);
+          
+          text {
+            font-size: 22rpx;
+            font-weight: 600;
+            color: #F5A623;
+            margin-left: 8rpx;
+          }
+        }
+      }
+    }
+    
+    .header-actions {
+      .icon-btn {
+        width: 72rpx;
+        height: 72rpx;
+        background: rgba(255,255,255,0.8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+        
+        &:active {
+          transform: scale(0.95);
+        }
+        
+        // 覆盖 icon 颜色为主题色
+        t-icon {
+          color: #667eea !important;
+        }
+      }
+    }
+  }
+
+  // 核心步数
+  .steps-core {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    
+    .steps-ring-wrapper {
+      position: relative;
+      width: 320rpx;
+      height: 320rpx;
+      margin-bottom: 40rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      // 调整 t-progress 大小
+      t-progress {
+        width: 100%;
+        height: 100%;
+        /* 修复组件内部可能存在的对齐问题 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .steps-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        width: 80%; /* 限制宽度，防止溢出 */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        
+        .steps-val {
+          font-size: 64rpx;
+          font-weight: 800;
+          color: #1a1a1a;
+          line-height: 1;
+          margin-bottom: 12rpx; /* 增加一点间距 */
+          font-family: DINAlternate-Bold, sans-serif; 
+        }
+        
+        .steps-label {
+          font-size: 24rpx;
+          color: #999;
+        }
+      }
+    }
+    
+    .steps-metrics {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      padding: 20rpx 48rpx;
+      border-radius: 40rpx;
+      box-shadow: 0 8rpx 24rpx rgba(102,126,234,0.08);
+      
+      .metric-item {
+        text-align: center;
+        min-width: 120rpx;
+        
+        .val {
+          display: block;
+          font-size: 32rpx;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 4rpx;
+        }
+        
+        .lbl {
+          font-size: 22rpx;
+          color: #999;
+        }
+      }
+      
+      .metric-divider {
+        width: 2rpx;
+        height: 32rpx;
+        background: #eee;
+        margin: 0 32rpx;
+      }
+    }
+  }
+  
+  // 悬浮记步按钮
+  .record-btn {
+    position: absolute;
+    right: 32rpx;
+    bottom: 40rpx; // 位于 dashboard 底部
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    background: #667eea;
+    padding: 16rpx 32rpx;
+    border-radius: 32rpx;
+    box-shadow: 0 8rpx 20rpx rgba(102,126,234,0.3);
+    color: #fff;
+    font-size: 26rpx;
+    font-weight: 600;
+    z-index: 2;
+    transition: all 0.3s;
+    
+    &:active {
+      transform: scale(0.95);
+      box-shadow: 0 4rpx 12rpx rgba(102,126,234,0.2);
+    }
+  }
+}
+
+// 页面主体 (向上偏移)
+.page-body {
+  margin-top: -40rpx; // 向上偏移，覆盖 Dashboard 底部
+  padding: 0 32rpx;
+  position: relative;
+  z-index: 2;
+  
+  // 金刚区
+  .nav-card {
+    background: #fff;
+    border-radius: 32rpx;
+    padding: 32rpx 20rpx;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.04);
+    margin-bottom: 32rpx;
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      
+      &:active {
+        opacity: 0.8;
+      }
+      
+      .nav-icon-box {
+        width: 96rpx;
+        height: 96rpx;
+        border-radius: 32rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16rpx;
+        box-shadow: 0 8rpx 16rpx rgba(0,0,0,0.06);
+        
+        // 不同颜色的渐变
+        &.icon-1 { background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); }
+        &.icon-2 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+        &.icon-3 { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
+        &.icon-4 { background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%); }
+      }
+      
+      .nav-title {
+        font-size: 24rpx;
+        color: #333;
+        font-weight: 500;
+      }
+    }
+  }
+  
+  // 双卡片行
+  .data-row {
+    display: flex;
+    gap: 24rpx;
+    margin-bottom: 32rpx;
+    
+    .data-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 32rpx;
+      padding: 24rpx 32rpx;
+      box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.04);
+      min-height: 200rpx;
+      display: flex;
+      flex-direction: column;
+      
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24rpx;
+        
+        .title {
+          font-size: 28rpx;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+      
+      .card-body {
+        flex: 1;
+        
+        &.center {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        &.empty {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #ccc;
+          font-size: 26rpx;
+        }
+        
+        .big-num {
+          font-size: 44rpx;
+          font-weight: 700;
+          color: #1a1a1a;
+          margin-bottom: 12rpx;
+          
+          .unit {
+            font-size: 24rpx;
+            color: #999;
+            font-weight: normal;
+            margin-left: 4rpx;
+          }
+        }
+        
+        .overview-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16rpx;
+          
+          &:last-child { margin-bottom: 0; }
+          
+          .lbl {
+            font-size: 26rpx;
+            color: #666;
+          }
+          
+          .val {
+            font-size: 28rpx;
+            font-weight: 600;
+            color: #333;
+          }
+        }
+      }
+    }
+  }
+  
+  // 通用 section 卡片
+  .section-card {
+    background: #fff;
+    border-radius: 32rpx;
+    padding: 32rpx;
+    box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.04);
+    margin-bottom: 32rpx;
+    
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32rpx;
+      
+      .title {
+        font-size: 32rpx;
+        font-weight: 700;
+        color: #1a1a1a;
+      }
+      
+      .subtitle {
+        font-size: 26rpx;
+        color: #999;
+        font-weight: 500;
+      }
+    }
+    
+    // 任务列表
+    .task-list {
+      .task-item {
+        display: flex;
+        align-items: center;
+        padding: 24rpx 0;
+        border-bottom: 1rpx dashed #f0f0f0;
+        
+        &:last-child { border-bottom: none; padding-bottom: 0; }
+        &:first-child { padding-top: 0; }
+        
+        &.done {
+          .task-info {
+            opacity: 0.5;
+            .task-title { text-decoration: line-through; }
+          }
+        }
+        
+        .check-icon {
+          margin-right: 24rpx;
+        }
+        
+        .task-info {
+          flex: 1;
+          margin-right: 24rpx;
+          
+          .task-title {
+            display: block;
+            font-size: 28rpx;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6rpx;
+          }
+          
+          .task-desc {
+            font-size: 22rpx;
+            color: #999;
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+  }
+  
+  // 生理期卡片
+  .period-card {
+    background: linear-gradient(135deg, #fff0f5 0%, #fff 100%);
+    border: 1rpx solid rgba(255, 117, 143, 0.1);
+    
+    .period-row {
+      display: flex;
+      align-items: center;
+      
+      .period-icon {
+        width: 80rpx;
+        height: 80rpx;
+        background: #fff;
+        border-radius: 24rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 24rpx;
+        box-shadow: 0 4rpx 12rpx rgba(255, 117, 143, 0.15);
+      }
+      
+      .period-info {
+        flex: 1;
+        
+        .main-text {
+          display: block;
+          font-size: 30rpx;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 6rpx;
+        }
+        
+        .sub-text {
+          font-size: 24rpx;
+          color: #ff758f;
+        }
+      }
+      
+      .period-action {
+        display: flex;
+        align-items: center;
+        font-size: 24rpx;
+        color: #999;
+      }
+    }
+  }
+}
+
+// 弹窗样式 (轻微优化)
+.period-modal {
+  // 保持原有定位
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; z-index: 999;
+  backdrop-filter: blur(4px);
+  
+  .period-modal-content {
+    width: 600rpx;
+    background: #fff;
+    border-radius: 32rpx;
+    overflow: hidden;
+    box-shadow: 0 16rpx 48rpx rgba(0,0,0,0.1);
+    
+    .period-modal-header {
+      padding: 40rpx 40rpx 20rpx;
+      display: flex; justify-content: space-between;
+      font-size: 32rpx; font-weight: 700; color: #333;
+    }
+    
+    .period-modal-body {
+      padding: 20rpx 40rpx 40rpx;
+      
+      .period-form-item {
+        margin-bottom: 32rpx;
+        .period-form-label { font-size: 26rpx; color: #666; margin-bottom: 16rpx; }
+        .period-form-input {
+          background: #f9f9f9;
+          padding: 24rpx;
+          border-radius: 16rpx;
+          font-size: 28rpx;
+          color: #333;
+        }
+      }
+    }
+    
+    .period-modal-footer {
+      display: flex; border-top: 1rpx solid #eee;
+      .period-modal-btn {
+        flex: 1; padding: 32rpx; text-align: center; font-size: 30rpx; font-weight: 600;
+        &.cancel { color: #999; }
+        &.confirm { color: #667eea; border-left: 1rpx solid #eee; }
+        &:active { background: #f9f9f9; }
+      }
+    }
+  }
+}

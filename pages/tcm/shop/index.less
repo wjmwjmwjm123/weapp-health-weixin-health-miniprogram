@@ -1,0 +1,121 @@
+@import '/variable.less';
+
+.shop-container {
+  min-height: 100vh;
+  background-color: @bg-color;
+  padding-bottom: 120rpx;
+
+  .shop-categories {
+    display: flex;
+    padding: 24rpx;
+    background-color: #fff;
+    border-bottom: 1rpx solid #f0f0f0;
+    overflow-x: auto;
+
+    .category-item {
+      padding: 12rpx 32rpx;
+      margin-right: 16rpx;
+      background-color: #f5f7fa;
+      border-radius: 20rpx;
+      font-size: 28rpx;
+      color: #666;
+      white-space: nowrap;
+      transition: all 0.3s;
+
+      &.active {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        color: #fff;
+      }
+    }
+  }
+
+  .shop-products {
+    padding: 24rpx;
+
+    .product-item {
+      display: flex;
+      background-color: #fff;
+      border-radius: 16rpx;
+      padding: 24rpx;
+      margin-bottom: 24rpx;
+      box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+
+      .product-image {
+        width: 160rpx;
+        height: 160rpx;
+        background-color: #f5f7fa;
+        border-radius: 12rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 24rpx;
+
+        .product-placeholder {
+          font-size: 64rpx;
+        }
+      }
+
+      .product-info {
+        flex: 1;
+
+        .product-name {
+          font-size: 32rpx;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin-bottom: 12rpx;
+        }
+
+        .product-desc {
+          font-size: 24rpx;
+          color: #666;
+          margin-bottom: 16rpx;
+        }
+
+        .product-price {
+          display: flex;
+          align-items: center;
+
+          .current-price {
+            font-size: 36rpx;
+            font-weight: 600;
+            color: #ff4757;
+            margin-right: 16rpx;
+          }
+
+          .original-price {
+            font-size: 24rpx;
+            color: #999;
+            text-decoration: line-through;
+          }
+        }
+      }
+
+      .product-action {
+        display: flex;
+        align-items: flex-end;
+
+        .add-cart-btn {
+          padding: 12rpx 24rpx;
+          background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+          color: #fff;
+          border-radius: 20rpx;
+          font-size: 24rpx;
+        }
+      }
+    }
+  }
+
+  .shop-tip {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24rpx;
+    background-color: #fff;
+    border-top: 1rpx solid #f0f0f0;
+    text-align: center;
+    font-size: 24rpx;
+    color: #999;
+  }
+}
+

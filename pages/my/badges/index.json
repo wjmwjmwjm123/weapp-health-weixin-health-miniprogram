@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "我的成就",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-progress": "tdesign-miniprogram/progress/progress",
+    "t-popup": "tdesign-miniprogram/popup/popup"
+  }
+}

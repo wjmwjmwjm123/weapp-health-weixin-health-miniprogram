@@ -1,0 +1,97 @@
+<view class="record-container">
+  <t-tabs value="{{currentTab}}" bind:change="onTabChange">
+    <t-tab-panel label="今日记录" value="0">
+      <view class="record-form">
+        <view class="record-section">
+          <view class="section-title">身体数据</view>
+          
+          <view class="form-item">
+            <view class="form-label">体重 (kg)</view>
+            <input
+              class="form-input"
+              type="digit"
+              placeholder="请输入体重"
+              value="{{records.weight}}"
+              bindinput="onWeightInput"
+            />
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">睡眠时长 (小时)</view>
+            <input
+              class="form-input"
+              type="digit"
+              placeholder="请输入睡眠时长"
+              value="{{records.sleep}}"
+              bindinput="onSleepInput"
+            />
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">生理期</view>
+            <t-switch value="{{records.period}}" bind:change="onPeriodChange" />
+          </view>
+        </view>
+
+        <view class="record-section">
+          <view class="section-title">饮食记录</view>
+          
+          <view class="form-item">
+            <view class="form-label">摄入卡路里 (卡)</view>
+            <input
+              class="form-input"
+              type="digit"
+              placeholder="请输入摄入的卡路里"
+              value="{{records.calories}}"
+              bindinput="onCaloriesInput"
+            />
+          </view>
+        </view>
+
+        <view class="record-section">
+          <view class="section-title">运动记录</view>
+          
+          <view class="form-item">
+            <view class="form-label">运动时长 (分钟)</view>
+            <input
+              class="form-input"
+              type="digit"
+              placeholder="请输入运动时长"
+              value="{{records.exercise}}"
+              bindinput="onExerciseInput"
+            />
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">消耗卡路里 (卡)</view>
+            <input
+              class="form-input"
+              type="digit"
+              placeholder="请输入消耗的卡路里"
+              value="{{records.exerciseCalories}}"
+              bindinput="onExerciseCaloriesInput"
+            />
+          </view>
+        </view>
+      </view>
+    </t-tab-panel>
+
+    <t-tab-panel label="历史记录" value="1">
+      <view class="history-list">
+        <view
+          wx:for="{{historyRecords}}"
+          wx:key="date"
+          class="history-item"
+        >
+          <view class="history-date">{{item.date}}</view>
+          <view class="history-data">
+            <text wx:if="{{item.weight}}">体重: {{item.weight}}kg</text>
+            <text wx:if="{{item.calories}}"> | 摄入: {{item.calories}}卡</text>
+            <text wx:if="{{item.exercise}}"> | 运动: {{item.exercise}}分钟</text>
+          </view>
+        </view>
+      </view>
+    </t-tab-panel>
+  </t-tabs>
+</view>
+

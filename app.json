@@ -1,0 +1,114 @@
+{
+  "pages": ["pages/home/index", "pages/tcm/index", "pages/travel/index", "pages/my/index"],
+  "usingComponents": {
+    "t-toast": "tdesign-miniprogram/toast/toast"
+  },
+  "subpackages": [
+    {
+      "root": "pages/my/info-edit",
+      "name": "edit",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/my/community",
+      "name": "community",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/my/badges",
+      "name": "badges",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/login",
+      "name": "login",
+      "pages": ["login", "wechat-login"]
+    },
+    {
+      "root": "pages/setting",
+      "name": "setting",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/tcm/medicated-diet",
+      "name": "medicated-diet",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/tcm/therapy",
+      "name": "therapy",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/tcm/knowledge",
+      "name": "knowledge",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/tcm/life",
+      "name": "life",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/tcm/consult",
+      "name": "consult",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/home/plan",
+      "name": "plan",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/home/course",
+      "name": "course",
+      "pages": ["index", "detail/index"]
+    },
+    {
+      "root": "pages/home/record",
+      "name": "record",
+      "pages": ["index"]
+    },
+    {
+      "root": "pages/home/mall",
+      "name": "mall",
+      "pages": ["index", "cart"]
+    },
+    {
+      "root": "pages/home/points",
+      "name": "points",
+      "pages": ["index"]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "Weixin",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/tcm/index",
+        "text": "中医"
+      },
+      {
+        "pagePath": "pages/travel/index",
+        "text": "旅游"
+      },
+      {
+        "pagePath": "pages/my/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "resolveAlias": {
+    "~/*": "/*"
+  },
+  "sitemapLocation": "sitemap.json"
+}

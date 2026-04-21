@@ -1,0 +1,28 @@
+<view class="points-container">
+  <view class="points-header">
+    <view class="points-icon">💰</view>
+    <view class="points-value">{{points}}</view>
+    <view class="points-label">当前积分</view>
+  </view>
+
+  <view class="points-history">
+    <view class="history-title">积分明细</view>
+    <view class="history-list">
+      <view
+        wx:for="{{pointsHistory}}"
+        wx:key="id"
+        class="history-item"
+      >
+        <view class="history-icon">{{item.type === 'earn' ? '➕' : '➖'}}</view>
+        <view class="history-info">
+          <view class="history-desc">{{item.desc}}</view>
+          <view class="history-time">{{item.time}}</view>
+        </view>
+        <view class="history-amount {{item.type === 'earn' ? 'earn' : 'deduct'}}">
+          {{item.type === 'earn' ? '+' : '-'}}{{item.amount}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+

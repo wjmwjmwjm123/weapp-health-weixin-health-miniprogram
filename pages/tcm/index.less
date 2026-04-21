@@ -1,0 +1,295 @@
+@import '/variable.less';
+
+.tcm-page {
+  height: 100vh;
+  background: linear-gradient(180deg, #f5f7fa 0%, @bg-color 100%);
+}
+
+.tcm-scroll {
+  height: 100%;
+  padding: calc(32rpx + env(safe-area-inset-top)) 32rpx @tab-bar-height;
+  box-sizing: border-box;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #5d7bff 0%, #50c3ff 100%);
+  border-radius: 32rpx;
+  color: #fff;
+  padding: 40rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+  box-shadow: 0 16rpx 32rpx rgba(58, 131, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 24rpx;
+    bottom: 24rpx;
+    width: 120rpx;
+    height: 120rpx;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+  }
+
+  .hero-left {
+    max-width: 70%;
+  }
+
+  .hero-label {
+    font-size: 26rpx;
+    opacity: 0.9;
+  }
+
+  .hero-title {
+    font-size: 44rpx;
+    font-weight: 600;
+    margin: 12rpx 0;
+    line-height: 1.3;
+  }
+
+  .hero-meta {
+    font-size: 24rpx;
+    display: flex;
+    gap: 24rpx;
+    opacity: 0.9;
+  }
+
+}
+
+.section {
+  margin-bottom: 32rpx;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20rpx;
+  }
+
+  .section-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .section-subtitle {
+    font-size: 24rpx;
+    color: #8c8c8c;
+  }
+}
+
+.diagnosis-card {
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 32rpx;
+  box-shadow: 0 12rpx 32rpx rgba(21, 39, 71, 0.08);
+
+  .diagnosis-summary {
+    margin-bottom: 20rpx;
+
+    .summary-title {
+      font-size: 34rpx;
+      font-weight: 600;
+      color: #1f1f1f;
+      margin-bottom: 8rpx;
+    }
+
+    .summary-desc {
+      font-size: 28rpx;
+      color: #404040;
+      line-height: 1.7;
+    }
+  }
+}
+
+.focus-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+
+  .focus-tag {
+    background: #f7fbff;
+    color: #3583ff;
+    border-radius: 999rpx;
+    padding: 10rpx 20rpx;
+    font-size: 24rpx;
+  }
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+
+  .quick-item {
+    background: #fff;
+    border-radius: 24rpx;
+    padding: 24rpx;
+    box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.04);
+
+    .quick-icon {
+      font-size: 44rpx;
+    }
+
+    .quick-title {
+      font-size: 28rpx;
+      font-weight: 600;
+      margin: 8rpx 0;
+    }
+
+    .quick-desc {
+      font-size: 24rpx;
+      color: #8c8c8c;
+    }
+  }
+}
+
+.recipe-card,
+.life-item,
+.feed-item,
+.nav-item {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(36, 61, 93, 0.06);
+}
+
+.recipe-card {
+  border: 1rpx solid #e7ecff;
+
+  .recipe-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10rpx;
+
+    .recipe-title {
+      font-size: 32rpx;
+      font-weight: 600;
+    }
+
+    .recipe-tag {
+      font-size: 24rpx;
+      color: #5d7bff;
+    }
+  }
+
+  .recipe-focus {
+    font-size: 26rpx;
+    color: #4d5a7a;
+    margin-bottom: 8rpx;
+  }
+
+  .recipe-ingredients {
+    font-size: 24rpx;
+    color: #8b93a7;
+  }
+}
+
+.teaching-card {
+  background: linear-gradient(135deg, #eef2ff 0%, #fef9ff 100%);
+  border-radius: 24rpx;
+  padding: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(36, 61, 93, 0.08);
+
+  .teaching-title {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #2b2e66;
+    margin-bottom: 8rpx;
+  }
+
+  .teaching-desc {
+    font-size: 26rpx;
+    color: #5c6192;
+    margin-bottom: 12rpx;
+  }
+
+  .teaching-link {
+    font-size: 24rpx;
+    color: #5d7bff;
+  }
+}
+
+.life-item {
+  border: 1rpx solid #f2f2f2;
+
+  .life-title {
+    font-size: 30rpx;
+    font-weight: 600;
+    margin-bottom: 8rpx;
+  }
+
+  .life-summary {
+    font-size: 26rpx;
+    color: #5c5c5c;
+    line-height: 1.6;
+  }
+}
+
+.feed-item {
+  .feed-title {
+    font-size: 28rpx;
+    color: #1a1a1a;
+    margin-bottom: 8rpx;
+  }
+
+  .feed-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 24rpx;
+    color: #7d7d7d;
+  }
+
+  .feed-tag {
+    background: #fdf4e7;
+    color: #ff8a00;
+    padding: 4rpx 16rpx;
+    border-radius: 999rpx;
+  }
+}
+
+.nav-modules .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+
+  .nav-icon {
+    width: 92rpx;
+    height: 92rpx;
+    border-radius: 24rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44rpx;
+    background: #f7f8ff;
+  }
+
+  .nav-content {
+    flex: 1;
+  }
+
+  .nav-title {
+    font-size: 30rpx;
+    font-weight: 600;
+  }
+
+  .nav-desc {
+    font-size: 24rpx;
+    color: #7d7d7d;
+    margin-top: 6rpx;
+  }
+
+  .nav-arrow {
+    font-size: 40rpx;
+    color: #d8d8d8;
+  }
+}
+
+.page-bottom-placeholder {
+  height: 80rpx;
+}
