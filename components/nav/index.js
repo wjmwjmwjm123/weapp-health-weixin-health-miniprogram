@@ -18,16 +18,6 @@ Component({
         isSidebar: true,
       },
       {
-        title: '搜索页',
-        url: 'pages/search/index',
-        isSidebar: false,
-      },
-      {
-        title: '发布页',
-        url: 'pages/release/index',
-        isSidebar: false,
-      },
-      {
         title: '个人中心页',
         url: 'pages/my/index',
         isSidebar: true,
@@ -40,11 +30,6 @@ Component({
       {
         title: '设置页',
         url: 'pages/setting/index',
-        isSidebar: false,
-      },
-      {
-        title: '数据图表页',
-        url: 'pages/dataCenter/index',
         isSidebar: false,
       },
       {
@@ -88,12 +73,6 @@ Component({
           });
         });
       }
-    },
-
-    searchTurn() {
-      wx.navigateTo({
-        url: `/pages/search/index`,
-      });
     },
   },
 });

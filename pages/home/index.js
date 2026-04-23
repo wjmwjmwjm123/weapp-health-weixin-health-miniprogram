@@ -50,6 +50,8 @@ function sortPeriodRecords(records, ascending = true) {
 Page({
   data: {
     userInfo: null,
+    avatarUrl: '',
+    displayName: '保持健康',
     points: 0, // 用户积分
     todayTask: {
       completed: 0, // 今日完成任务数
@@ -216,6 +218,8 @@ Page({
     this.loadUserData();
     // 刷新步数数据
     this.updateStepData();
+    // 从后端同步步数
+    this.loadStepsFromBackend();
     // 检查昨日任务是否达标（每日检查）
     this.checkYesterdayTask();
   },
@@ -272,8 +276,8 @@ Page({
     //   todayTask: userData.data.todayTask || { completed: 0, total: 3 },
     // });
 
-    // 从存储中读取积分和任务数据
-    const points = getPoints();
+    // 从存储中读取积分和任务数据（未登录时积分显示为0）
+    const points = isLoggedIn() ? getPoints() : 0;
     const today = formatDateStr();
     const taskKey = this.getTodayTaskKey(today);
 
@@ -376,14 +380,18 @@ Page({
     // 读取步数数据
     const stepData = this.loadStepData(bodyData);
 
-    // 尝试从微信获取步数
-    this.getWeChatSteps();
-
     // 调试日志（开发时查看）
     // console.log('首页加载数据:', { planData, bodyData, todayRecord, todayData, todayTask });
 
+    const userInfo = isLoggedIn() ? (wx.getStorageSync('user_info') || null) : null;
+    const avatarUrl = userInfo ? (userInfo.avatarUrl || userInfo.avatar || '') : '';
+    const displayName = userInfo ? (userInfo.nickName || userInfo.nickname || '保持健康') : '保持健康';
+
     this.setData({
-      userInfo: isLoggedIn() ? (wx.getStorageSync('user_info') || null) : null,
+      userInfo,
+      avatarUrl,
+      displayName,
+      avatarError: false,
       points: pointsAfterTask,
       todayTask,
       taskList,
@@ -901,111 +909,35 @@ Page({
     return weekly;
   },
 
-  // 从微信获取步数
-  // 注意：微信步数数据是加密的，需要后端服务器解密
-  // 微信步数 = 用户在"微信运动"中的步数（不是手机系统步数）
-  getWeChatSteps() {
-    wx.showLoading({
-      title: '获取中...',
-      mask: true,
-    });
-    
-    // 检查是否支持微信运动
-    if (wx.getWeRunData) {
-      wx.getWeRunData({
-        success: (res) => {
-          wx.hideLoading();
-          console.log('微信步数原始数据:', res);
-          
-          // 微信步数数据是加密的，包含：
-          // - encryptedData: 加密的步数数据
-          // - iv: 初始向量
-          // 需要发送到后端服务器，使用 session_key 解密
-          
-          if (res.encryptedData && res.iv) {
-            // 有加密数据，需要后端解密
-            // 这里提供一个选项：使用模拟数据或提示需要后端
-            wx.showModal({
-              title: '微信步数说明',
-              content: '微信步数数据已加密，需要后端服务器解密才能获取真实步数。\n\n说明：\n1. 微信步数来自"微信运动"（不是手机系统步数）\n2. 需要用户开启微信运动并授权\n3. 数据需要后端解密\n\n当前可以使用模拟数据测试，或手动输入步数。',
-              confirmText: '使用模拟数据',
-              cancelText: '手动设置',
-              success: (modalRes) => {
-                if (modalRes.confirm) {
-                  // 使用模拟步数（仅用于测试）
-                  const mockSteps = Math.floor(Math.random() * 5000) + 5000; // 5000-10000之间的随机数
-                  const today = formatDateStr();
-                  wx.setStorageSync(`steps_${today}`, mockSteps);
-                  this.updateStepData();
-                  wx.showToast({
-                    title: `已同步：${mockSteps}步（模拟）`,
-                    icon: 'success',
-                  });
-                } else {
-                  // 用户选择手动设置
-                  this.setManualSteps();
-                }
-              },
-            });
-          } else {
-            // 没有加密数据，使用本地存储的步数
-            this.updateStepData();
-            wx.showToast({
-              title: '已同步本地步数',
-              icon: 'success',
-            });
-          }
-        },
-        fail: (err) => {
-          wx.hideLoading();
-          console.error('获取微信步数失败:', err);
-          
-          // 获取失败，使用本地步数
+  // 从后端加载步数
+  async loadStepsFromBackend() {
+    if (!isLoggedIn()) return;
+    try {
+      const today = formatDateStr();
+      const res = await request('/api/user/exercise', 'GET', { start: today, end: today });
+      if (res.code === 200 && res.data && res.data.length > 0) {
+        const record = res.data[0];
+        if (record.steps && record.steps > 0) {
+          wx.setStorageSync(`steps_${today}`, record.steps);
           this.updateStepData();
-          
-          // 根据错误类型给出不同提示
-          if (err.errMsg && (err.errMsg.includes('auth deny') || err.errMsg.includes('authorize'))) {
-            wx.showModal({
-              title: '需要授权',
-              content: '获取微信步数需要授权。\n\n请确保：\n1. 已开启"微信运动"功能\n2. 已授权小程序访问运动数据\n\n或使用"手动设置"直接输入步数。',
-              confirmText: '手动设置',
-              cancelText: '取消',
-              success: (modalRes) => {
-                if (modalRes.confirm) {
-                  this.setManualSteps();
-                }
-              },
-            });
-          } else {
-            wx.showModal({
-              title: '获取失败',
-              content: '无法获取微信步数，可能原因：\n1. 未开启微信运动\n2. 网络问题\n3. 需要后端服务器支持\n\n建议使用"手动设置"功能直接输入步数。',
-              confirmText: '手动设置',
-              cancelText: '取消',
-              success: (modalRes) => {
-                if (modalRes.confirm) {
-                  this.setManualSteps();
-                }
-              },
-            });
-          }
-        },
-      });
-    } else {
-      wx.hideLoading();
-      // 不支持微信步数API
-      wx.showModal({
-        title: '不支持',
-        content: '当前微信版本不支持步数获取功能。\n\n请使用"手动设置"功能直接输入步数。',
-        confirmText: '手动设置',
-        cancelText: '取消',
-        success: (modalRes) => {
-          if (modalRes.confirm) {
-            this.setManualSteps();
-          }
-        },
-      });
+        }
+      }
+    } catch (err) {
+      console.warn('从后端加载步数失败:', err.message);
     }
+  },
+
+  // 头像加载失败
+  onAvatarError() {
+    this.setData({ avatarError: true, avatarUrl: '' });
+  },
+
+  // 刷新步数（从后端同步）
+  refreshSteps() {
+    wx.showLoading({ title: '同步中...', mask: true });
+    this.loadStepsFromBackend().finally(() => {
+      wx.hideLoading();
+    });
   },
 
   // 更新步数数据
@@ -1028,6 +960,16 @@ Page({
             const today = formatDateStr();
             wx.setStorageSync(`steps_${today}`, steps);
             this.updateStepData();
+
+            // 同步到后端
+            if (isLoggedIn()) {
+              request('/api/user/exercise', 'POST', {
+                date: today,
+                type: 'steps',
+                steps: steps,
+              }).catch((err) => console.warn('步数同步后端失败:', err.message));
+            }
+
             wx.showToast({
               title: '设置成功',
               icon: 'success',

@@ -1,54 +1,80 @@
 <view class="login-container">
-  <!-- 背景装饰 -->
-  <view class="login-bg">
-    <view class="bg-circle circle-1"></view>
-    <view class="bg-circle circle-2"></view>
-    <view class="bg-circle circle-3"></view>
+  <!-- 顶部大图 -->
+  <view class="login-hero">
+    <image class="login-hero-img" src="/static/home/swiper0.png" mode="aspectFill" />
+    <view class="login-hero-mask" />
   </view>
 
-  <!-- 主要内容 -->
-  <view class="login-content">
-    <!-- Logo 和标题 -->
+  <!-- 内容区 -->
+  <view class="login-body">
     <view class="login-header">
-      <view class="login-logo">🏃‍♀️</view>
-      <view class="login-title">欢迎使用纤途无忧</view>
-      <view class="login-subtitle">记录每一次努力，见证更好的自己</view>
+      <text class="login-greeting">欢迎来到</text>
+      <text class="login-title">纤途无忧</text>
+      <text class="login-subtitle">健康生活 · 中医调理 · 每日陪伴</text>
+    </view>
+
+    <!-- 功能亮点 -->
+    <view class="login-features">
+      <view class="feature-item">
+        <text class="feature-icon">🌿</text>
+        <text class="feature-text">中医体质</text>
       </view>
+      <view class="feature-divider" />
+      <view class="feature-item">
+        <text class="feature-icon">🥣</text>
+        <text class="feature-text">药膳调理</text>
+      </view>
+      <view class="feature-divider" />
+      <view class="feature-item">
+        <text class="feature-icon">🏃</text>
+        <text class="feature-text">健康记录</text>
+      </view>
+    </view>
+
+    <!-- 头像昵称填写 -->
+    <view class="profile-setup">
+      <button class="avatar-choose-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+        <image class="avatar-preview" src="{{avatarUrl}}" mode="aspectFill" />
+        <view class="avatar-edit-icon">
+          <text>📷</text>
+        </view>
+      </button>
+      <view class="nickname-wrap">
+        <input
+          type="nickname"
+          class="nickname-input"
+          placeholder="请输入昵称"
+          value="{{nickname}}"
+          bindblur="onNicknameBlur"
+        />
+      </view>
+    </view>
 
     <!-- 登录按钮 -->
     <view class="login-actions">
-      <view class="wechat-login-btn {{loading ? 'loading' : ''}}" bindtap="onWechatLogin">
-        <view class="btn-icon">
-          <image class="wechat-icon" src="/static/icon_wx.png" mode="aspectFit" wx:if="{{!loading}}"></image>
-          <view class="loading-spinner" wx:else></view>
-        </view>
-        <text class="btn-text">{{loading ? '登录中...' : '微信快捷登录'}}</text>
-      </view>
-      
-      <!-- 提示信息 -->
-      <view class="login-tip">
-        <text class="tip-text">点击登录将弹出授权窗口，请选择"允许"以获取您的微信昵称和头像</text>
+      <view class="wechat-login-btn {{loading ? 'loading' : ''}} {{!isAgree ? 'disabled' : ''}}" bindtap="onWechatLogin">
+        <image class="btn-icon" src="/static/icon_wx.png" mode="aspectFit" wx:if="{{!loading}}" />
+        <view class="loading-spinner" wx:else></view>
+        <text class="btn-text">{{loading ? '登录中...' : '微信一键登录'}}</text>
       </view>
     </view>
 
-      <!-- 协议选择 -->
-      <view class="login-agreement">
-        <view class="agreement-check" bindtap="onToggleAgree">
-          <view class="agree-box {{isAgree ? 'checked' : ''}}">
-            <text class="agree-icon" wx:if="{{isAgree}}">✔</text>
-          </view>
-          <text class="agree-text">我已阅读并同意</text>
+    <!-- 协议 -->
+    <view class="login-agreement">
+      <view class="agreement-check" bindtap="onToggleAgree">
+        <view class="agree-box {{isAgree ? 'checked' : ''}}">
+          <text class="agree-icon" wx:if="{{isAgree}}">✓</text>
         </view>
-        <view class="agreement-links">
-          <text class="link-text" bindtap="onShowAgreement">《用户协议》</text>
-          <text class="link-divider">和</text>
-          <text class="link-text" bindtap="onShowPrivacy">《隐私政策》</text>
-        </view>
+        <text class="agree-text">我已阅读并同意</text>
+        <text class="link-text" bindtap="onShowAgreement">《用户协议》</text>
+        <text class="link-divider">和</text>
+        <text class="link-text" bindtap="onShowPrivacy">《隐私政策》</text>
       </view>
-    </view>
-
-    <!-- 底部提示 -->
-    <view class="login-footer">
-      <text class="footer-text">登录即表示同意相关协议</text>
     </view>
   </view>
+
+  <!-- 底部 -->
+  <view class="login-footer">
+    <text class="footer-text">登录即表示同意相关协议</text>
+  </view>
+</view>

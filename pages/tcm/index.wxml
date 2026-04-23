@@ -1,113 +1,120 @@
-<view class="tcm-page" enable-flex="true">
-  <scroll-view class="tcm-scroll" scroll-y="true" enable-flex="true">
-    <view class="hero-card" bindtap="onHeroTap">
-      <view class="hero-left">
-        <view class="hero-label">本地中医接入</view>
-        <view class="hero-title">{{summary.city}} · {{summary.focus}}</view>
+<view class="tcm-page">
+  <scroll-view class="tcm-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+
+    <!-- Hero 区域 -->
+    <view class="hero" bindtap="onHeroTap">
+      <view class="hero-bg" />
+      <view class="hero-content">
+        <text class="hero-label">中医健康</text>
+        <text class="hero-title">{{summary.city}} · {{summary.focus}}</text>
         <view class="hero-meta">
-          <text>积分 {{summary.points}}</text>
-          <text>上次测评：{{summary.lastCheck}}</text>
+          <text class="hero-meta-item">积分 {{summary.points}}</text>
+          <text class="hero-meta-dot">·</text>
+          <text class="hero-meta-item">测评 {{summary.lastCheck}}</text>
         </view>
       </view>
     </view>
 
-    <view class="section">
-      <view class="section-header">
-        <view>
-          <view class="section-title">今日体质洞察</view>
-          <view class="section-subtitle">基于计划与日常记录实时更新</view>
-        </view>
+    <!-- 体质洞察 -->
+    <view class="insight">
+      <view class="insight-header">
+        <text class="insight-title">今日体质</text>
+        <text class="insight-badge">{{diagnosis.constitution}}</text>
       </view>
-      <view class="diagnosis-card">
-        <view class="diagnosis-summary">
-          <view class="summary-title">{{diagnosis.constitution}}</view>
-          <view class="summary-desc">{{diagnosis.advice}}</view>
-        </view>
-        <view class="focus-tags">
-          <text class="focus-tag" wx:for="{{focusTips}}" wx:key="index">{{item}}</text>
+      <text class="insight-desc">{{diagnosis.advice}}</text>
+      <view class="insight-tags">
+        <text class="insight-tag" wx:for="{{focusTips}}" wx:key="index">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 快速操作 -->
+    <view class="quick-bar">
+      <view class="quick-item" wx:for="{{quickActions}}" wx:key="id" data-id="{{item.id}}" data-url="{{item.url}}" bindtap="onActionTap">
+        <view class="quick-icon">{{item.icon}}</view>
+        <text class="quick-title">{{item.title}}</text>
+      </view>
+    </view>
+
+    <!-- 当日药膳 -->
+    <view class="recipe-section" wx:if="{{dailyRecipe}}" bindtap="onDailyRecipeTap">
+      <view class="recipe-bg" />
+      <view class="recipe-content">
+        <view class="recipe-label">当日药膳 · {{dailyRecipe.timing}}</view>
+        <text class="recipe-title">{{dailyRecipe.title}}</text>
+        <text class="recipe-focus">{{dailyRecipe.focus}}</text>
+        <view class="recipe-ingredients">
+          <text wx:for="{{dailyRecipe.ingredients}}" wx:key="index" class="recipe-ing">{{item}}</text>
         </view>
       </view>
     </view>
 
-    <view class="section">
+    <!-- 理疗方案 -->
+    <view class="section" wx:if="{{therapyPackages.length}}">
       <view class="section-header">
-        <view class="section-title">快速操作</view>
-        <view class="section-subtitle">常用功能一键直达</view>
+        <text class="section-title">理疗方案</text>
+        <text class="section-more" bindtap="openClassroom">查看全部 ›</text>
       </view>
-      <view class="quick-grid">
-        <view
-          class="quick-item"
-          wx:for="{{quickActions}}"
-          wx:key="id"
-          data-id="{{item.id}}"
-          data-url="{{item.url}}"
-          bindtap="onActionTap"
-        >
-          <view class="quick-icon">{{item.icon}}</view>
-          <view class="quick-title">{{item.title}}</view>
-          <view class="quick-desc">{{item.desc}}</view>
-        </view>
-      </view>
-    </view>
-
-    <view class="section" wx:if="{{dailyRecipe}}">
-      <view class="section-header">
-        <view class="section-title">当日药膳</view>
-        <view class="section-subtitle">从药膳教学中为你挑选</view>
-      </view>
-      <view class="recipe-card" bindtap="onDailyRecipeTap">
-        <view class="recipe-head">
-          <view class="recipe-title">{{dailyRecipe.title}}</view>
-          <view class="recipe-tag">{{dailyRecipe.timing}} · {{dailyRecipe.season}}</view>
-        </view>
-        <view class="recipe-focus">{{dailyRecipe.focus}}</view>
-        <view class="recipe-ingredients">主要食材：{{dailyRecipe.ingredients.join('、')}}</view>
-      </view>
-    </view>
-
-    <view class="section">
-      <view class="section-header">
-        <view class="section-title">药膳教学</view>
-        <view class="section-subtitle">更多配伍与烹煮技巧</view>
-      </view>
-      <view class="teaching-card" bindtap="onTeachingTap">
-        <view class="teaching-title">收录 {{medicatedLessons.length}} 个方子</view>
-        <view class="teaching-desc">季节调护 · 体质餐单 · 烹煮技巧</view>
-        <view class="teaching-link">进入药膳课堂 ›</view>
-      </view>
-    </view>
-
-    <view class="section" wx:if="{{lifeTips.length}}">
-      <view class="section-header">
-        <view class="section-title">生活常识</view>
-        <view class="section-subtitle">体质养护、作息、运动建议</view>
-      </view>
-      <block wx:for="{{lifeTips}}" wx:key="id">
-        <view class="life-item" data-index="{{index}}" bindtap="onLifeTipTap">
-          <view class="life-title">{{item.title}}</view>
-          <view class="life-summary">{{item.summary}}</view>
-        </view>
-      </block>
-    </view>
-
-    <view class="section">
-      <view class="section-header">
-        <view class="section-title">中医知识快报</view>
-        <view class="section-subtitle">每日3分钟精读</view>
-      </view>
-      <block wx:for="{{knowledgeFeeds}}" wx:key="id">
-        <view class="feed-item" data-id="{{item.id}}" bindtap="onKnowledgeTap">
-          <view class="feed-title">{{item.title}}</view>
-          <view class="feed-meta">
-            <text class="feed-tag">{{item.tag}}</text>
-            <text>{{item.time}}</text>
+      <view class="therapy-list">
+        <view class="therapy-item" wx:for="{{therapyPackages}}" wx:key="id">
+          <view class="therapy-left">
+            <text class="therapy-title">{{item.title}}</text>
+            <text class="therapy-desc">{{item.desc}}</text>
+            <view class="therapy-footer">
+              <text class="therapy-tag">{{item.tag}}</text>
+              <text class="therapy-duration">{{item.duration}}</text>
+            </view>
+          </view>
+          <view class="therapy-right">
+            <text class="therapy-seats">{{item.seats}}</text>
           </view>
         </view>
-      </block>
+      </view>
     </view>
 
+    <!-- 生活常识 -->
+    <view class="section" wx:if="{{lifeTips.length}}">
+      <view class="section-header">
+        <text class="section-title">生活常识</text>
+      </view>
+      <view class="life-list">
+        <view class="life-row" wx:for="{{lifeTips}}" wx:key="id" data-index="{{index}}" bindtap="onLifeTipTap">
+          <view class="life-dot" />
+          <view class="life-body">
+            <text class="life-title">{{item.title}}</text>
+            <text class="life-summary">{{item.summary}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
 
-    <view class="page-bottom-placeholder" />
+    <!-- 中医知识快报 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">知识快报</text>
+      </view>
+      <view class="feed-list">
+        <view class="feed-row" wx:for="{{knowledgeFeeds}}" wx:key="id" data-id="{{item.id}}" bindtap="onKnowledgeTap">
+          <view class="feed-left">
+            <text class="feed-tag">{{item.tag}}</text>
+            <text class="feed-title">{{item.title}}</text>
+          </view>
+          <text class="feed-time">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 药膳教学入口 -->
+    <view class="teaching-row" bindtap="onTeachingTap">
+      <image class="teaching-img" src="/static/home/card1.png" mode="aspectFill" />
+      <view class="teaching-mask" />
+      <view class="teaching-content">
+        <text class="teaching-title">药膳教学</text>
+        <text class="teaching-desc">收录 {{medicatedLessons.length}} 个方子 · 季节调护 · 体质餐单</text>
+      </view>
+      <text class="teaching-arrow">›</text>
+    </view>
+
+    <view class="page-bottom" />
   </scroll-view>
 </view>
 

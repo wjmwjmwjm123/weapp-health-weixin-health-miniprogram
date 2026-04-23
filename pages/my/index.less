@@ -1,17 +1,17 @@
 .my-page {
   min-height: 100vh;
-  padding: 120rpx 32rpx 48rpx;
-  background: linear-gradient(180deg, #f1f4ff 0%, #fdfdff 100%);
+  padding: 0 0 48rpx;
+  background: #f5f6fa;
   box-sizing: border-box;
   position: relative;
 
-  .hero-bg {
+  .top-gradient {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 260rpx;
-    opacity: 0.6;
+    height: 320rpx;
+    background: linear-gradient(180deg, #e8edff 0%, #f5f6fa 100%);
     z-index: 0;
   }
 
@@ -25,15 +25,15 @@
     position: relative;
     z-index: 1;
     background: #fff;
-    border-radius: 32rpx;
-    box-shadow: 0 20rpx 60rpx rgba(89, 107, 255, 0.08);
-    padding: 32rpx;
-    margin-bottom: 32rpx;
+    border-radius: 20rpx;
+    padding: 28rpx;
+    margin: 0 24rpx 20rpx;
   }
 
   .profile-card {
-    background: linear-gradient(135deg, #6f7dff 0%, #b28cff 100%);
+    background: linear-gradient(135deg, #667eea 0%, #8f6bff 100%);
     color: #fff;
+    margin-top: 40rpx;
 
     .user-info {
       display: flex;
@@ -57,6 +57,21 @@
     .avatar-shell image {
       width: 100%;
       height: 100%;
+    }
+
+    .avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.gradient {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        color: #fff;
+        font-size: 48rpx;
+        font-weight: 700;
+      }
     }
 
     .user-meta {
@@ -366,8 +381,8 @@
 
   .module-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     margin-bottom: 24rpx;
 
     .title {
@@ -379,10 +394,11 @@
     .sub {
       font-size: 24rpx;
       color: #8186a5;
-      margin-top: 6rpx;
+      margin-top: 8rpx;
     }
 
     .chip {
+      margin-top: 8rpx;
       padding: 8rpx 20rpx;
       border-radius: 999rpx;
       background: rgba(111, 125, 255, 0.15);
@@ -521,10 +537,12 @@
       display: flex;
       align-items: center;
       gap: 16rpx;
-      padding: 20rpx;
-      border-radius: 24rpx;
-      background: #fdfdfd;
-      border: 1rpx solid #f0f1f8;
+      padding: 22rpx 0;
+      border-bottom: 1rpx solid #f0f1f5;
+
+      &:last-child {
+        border-bottom: none;
+      }
     }
 
     .playbook-item .icon {
@@ -555,10 +573,12 @@
     }
 
     .redeem-item {
-      padding: 20rpx;
-      border-radius: 24rpx;
-      background: linear-gradient(160deg, #fff, #f7faff);
-      border: 1rpx solid #eef0ff;
+      padding: 20rpx 0;
+      border-bottom: 1rpx solid #f0f1f5;
+
+      &:nth-last-child(-n+2) {
+        border-bottom: none;
+      }
     }
 
     .redeem-title {
@@ -636,13 +656,12 @@
       .locked-tip {
         margin-top: 16rpx;
         font-size: 26rpx;
-        color: #6d7396;
+        color: rgba(255, 255, 255, 0.9);
         line-height: 1.6;
-        display: flex;
-        justify-content: space-between;
-        gap: 24rpx;
-        align-items: center;
-        flex-wrap: wrap;
+
+        .primary-btn.small {
+          margin-top: 20rpx;
+        }
       }
     }
   }
@@ -658,9 +677,12 @@
       display: flex;
       align-items: center;
       gap: 16rpx;
-      padding: 20rpx;
-      border-radius: 24rpx;
-      border: 1rpx solid #eef0ff;
+      padding: 22rpx 0;
+      border-bottom: 1rpx solid #f0f1f5;
+
+      &:last-child {
+        border-bottom: none;
+      }
     }
 
     .group-icon {
@@ -920,9 +942,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20rpx;
-      border-radius: 24rpx;
-      border: 1rpx solid #eef0ff;
+      padding: 22rpx 0;
+      border-bottom: 1rpx solid #f0f1f5;
+
+      &:last-child {
+        border-bottom: none;
+      }
     }
 
     .recharge-title {
@@ -986,14 +1011,26 @@
     .account-actions {
       display: flex;
       flex-direction: column;
-      gap: 16rpx;
     }
 
     .account-item {
-      padding: 20rpx;
-      border-radius: 24rpx;
-      border: 1rpx solid #edf0ff;
-      background: #fbfcff;
+      padding: 24rpx 40rpx 24rpx 0;
+      border-bottom: 1rpx solid #f0f1f5;
+      position: relative;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &::after {
+        content: '›';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 32rpx;
+        color: #c5c8d6;
+      }
     }
 
     .account-title {

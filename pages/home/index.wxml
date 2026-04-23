@@ -4,9 +4,12 @@
     <!-- 用户信息行 -->
     <view class="user-header">
       <view class="user-info">
-        <t-avatar class="user-avatar" icon="user" size="medium" />
+        <view class="user-avatar custom-avatar">
+          <image wx:if="{{avatarUrl && !avatarError}}" src="{{avatarUrl}}" mode="aspectFill" binderror="onAvatarError" />
+          <text wx:else>{{displayName[0] || '?'}}</text>
+        </view>
         <view class="user-text">
-          <view class="greeting">Hi, 保持健康</view>
+          <view class="greeting">Hi, {{displayName}}</view>
           <view class="points-tag" bindtap="onPointsTap">
             <t-icon name="money-circle" size="28rpx" />
             <text>{{points}} 积分</text>
@@ -14,11 +17,11 @@
         </view>
       </view>
       <view class="header-actions">
-        <view class="icon-btn" bindtap="getWeChatSteps">
+        <view class="icon-btn" bindtap="refreshSteps">
           <t-icon name="refresh" size="40rpx" color="#fff" />
-            </view>
-          </view>
         </view>
+      </view>
+    </view>
 
     <!-- 核心步数展示 -->
     <view class="steps-core">

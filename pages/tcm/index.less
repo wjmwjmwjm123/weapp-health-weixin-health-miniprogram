@@ -1,295 +1,450 @@
 @import '/variable.less';
 
+// 暖色调变量
+@tcm-bg: #f8f5f0;
+@tcm-warm: #c4a882;
+@tcm-brown: #8b6f47;
+@tcm-dark: #3d3229;
+@tcm-light: #f0ebe3;
+@tcm-border: #e8e0d4;
+
 .tcm-page {
   height: 100vh;
-  background: linear-gradient(180deg, #f5f7fa 0%, @bg-color 100%);
+  background: @tcm-bg;
 }
 
 .tcm-scroll {
   height: 100%;
-  padding: calc(32rpx + env(safe-area-inset-top)) 32rpx @tab-bar-height;
+  padding: env(safe-area-inset-top) 0 calc(@tab-bar-height + 32rpx);
   box-sizing: border-box;
 }
 
-.hero-card {
-  background: linear-gradient(135deg, #5d7bff 0%, #50c3ff 100%);
-  border-radius: 32rpx;
-  color: #fff;
-  padding: 40rpx;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32rpx;
-  box-shadow: 0 16rpx 32rpx rgba(58, 131, 255, 0.2);
+/* ===== Hero 区域 ===== */
+.hero {
   position: relative;
+  height: 260rpx;
+  margin: 16rpx 24rpx 28rpx;
+  border-radius: 24rpx;
   overflow: hidden;
+  background: linear-gradient(135deg, #d8ccb8 0%, #c9bcaa 100%);
 
-  &::after {
-    content: '';
+  .hero-bg {
     position: absolute;
-    right: 24rpx;
-    bottom: 24rpx;
-    width: 120rpx;
-    height: 120rpx;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 50%;
+    inset: 0;
+    background: linear-gradient(160deg, #e0d5c5 0%, #d0c4b0 50%, #c4b8a4 100%);
+    opacity: 0.7;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(120, 100, 80, 0.12) 100%);
+    }
   }
 
-  .hero-left {
-    max-width: 70%;
-  }
+  .hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 32rpx;
+    color: #fff;
 
-  .hero-label {
-    font-size: 26rpx;
-    opacity: 0.9;
-  }
+    .hero-label {
+      font-size: 24rpx;
+      opacity: 0.85;
+      letter-spacing: 2rpx;
+    }
 
-  .hero-title {
-    font-size: 44rpx;
-    font-weight: 600;
-    margin: 12rpx 0;
-    line-height: 1.3;
-  }
+    .hero-title {
+      font-size: 40rpx;
+      font-weight: 600;
+      margin: 12rpx 0 16rpx;
+      line-height: 1.3;
+    }
 
-  .hero-meta {
-    font-size: 24rpx;
-    display: flex;
-    gap: 24rpx;
-    opacity: 0.9;
-  }
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      font-size: 24rpx;
+      opacity: 0.9;
 
+      .hero-meta-dot {
+        margin: 0 12rpx;
+        opacity: 0.6;
+      }
+    }
+  }
 }
 
+/* ===== 体质洞察 ===== */
+.insight {
+  margin: 0 24rpx 32rpx;
+  padding: 28rpx;
+  background: #fff;
+  border-radius: 24rpx;
+
+  .insight-header {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+    margin-bottom: 16rpx;
+
+    .insight-title {
+      font-size: 30rpx;
+      font-weight: 600;
+      color: @tcm-dark;
+    }
+
+    .insight-badge {
+      font-size: 22rpx;
+      color: @tcm-brown;
+      background: @tcm-light;
+      padding: 6rpx 16rpx;
+      border-radius: 999rpx;
+      border: 1rpx solid @tcm-border;
+    }
+  }
+
+  .insight-desc {
+    font-size: 28rpx;
+    color: #5a5046;
+    line-height: 1.7;
+    margin-bottom: 20rpx;
+  }
+
+  .insight-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12rpx;
+
+    .insight-tag {
+      font-size: 24rpx;
+      color: @tcm-brown;
+      background: @tcm-light;
+      padding: 8rpx 18rpx;
+      border-radius: 999rpx;
+      border: 1rpx solid @tcm-border;
+    }
+  }
+}
+
+/* ===== 快速操作 ===== */
+.quick-bar {
+  display: flex;
+  justify-content: space-around;
+  margin: 0 24rpx 40rpx;
+  padding: 24rpx 0;
+
+  .quick-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10rpx;
+
+    .quick-icon {
+      width: 96rpx;
+      height: 96rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48rpx;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 4rpx 16rpx rgba(139, 111, 71, 0.1);
+    }
+
+    .quick-title {
+      font-size: 24rpx;
+      color: @tcm-dark;
+    }
+  }
+}
+
+/* ===== 当日药膳 ===== */
+.recipe-section {
+  position: relative;
+  height: 240rpx;
+  margin: 0 24rpx 32rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(135deg, #d4c9b8 0%, #c9bcaa 100%);
+
+  .recipe-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(160deg, #e0d5c5 0%, #d4c9b8 50%, #c8bcab 100%);
+    opacity: 0.75;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(100, 85, 65, 0.55) 0%, rgba(100, 85, 65, 0.1) 60%);
+    }
+  }
+
+  .recipe-content {
+    position: relative;
+    padding: 28rpx;
+    color: #fff;
+    width: 100%;
+
+    .recipe-label {
+      font-size: 22rpx;
+      opacity: 0.85;
+      margin-bottom: 8rpx;
+    }
+
+    .recipe-title {
+      font-size: 36rpx;
+      font-weight: 600;
+      margin-bottom: 8rpx;
+    }
+
+    .recipe-focus {
+      font-size: 26rpx;
+      opacity: 0.9;
+      margin-bottom: 12rpx;
+    }
+
+    .recipe-ingredients {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8rpx;
+
+      .recipe-ing {
+        font-size: 22rpx;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4rpx 14rpx;
+        border-radius: 999rpx;
+        backdrop-filter: blur(4rpx);
+      }
+    }
+  }
+}
+
+/* ===== 通用区块 ===== */
 .section {
-  margin-bottom: 32rpx;
+  margin: 0 24rpx 40rpx;
 
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20rpx;
-  }
 
-  .section-title {
-    font-size: 32rpx;
-    font-weight: 600;
-    color: #1a1a1a;
-  }
+    .section-title {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: @tcm-dark;
+    }
 
-  .section-subtitle {
-    font-size: 24rpx;
-    color: #8c8c8c;
+    .section-more {
+      font-size: 26rpx;
+      color: @tcm-brown;
+    }
   }
 }
 
-.diagnosis-card {
-  background: #fff;
-  border-radius: 28rpx;
-  padding: 32rpx;
-  box-shadow: 0 12rpx 32rpx rgba(21, 39, 71, 0.08);
+/* ===== 理疗方案 ===== */
+.therapy-list {
+  .therapy-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24rpx 0;
+    border-bottom: 1rpx solid @tcm-border;
 
-  .diagnosis-summary {
-    margin-bottom: 20rpx;
+    &:last-child {
+      border-bottom: none;
+    }
 
-    .summary-title {
-      font-size: 34rpx;
+    .therapy-left {
+      flex: 1;
+      padding-right: 20rpx;
+
+      .therapy-title {
+        font-size: 30rpx;
+        font-weight: 600;
+        color: @tcm-dark;
+        margin-bottom: 6rpx;
+      }
+
+      .therapy-desc {
+        font-size: 26rpx;
+        color: #7a6e60;
+        line-height: 1.5;
+        margin-bottom: 10rpx;
+      }
+
+      .therapy-footer {
+        display: flex;
+        align-items: center;
+        gap: 16rpx;
+
+        .therapy-tag {
+          font-size: 22rpx;
+          color: @tcm-brown;
+          background: @tcm-light;
+          padding: 4rpx 14rpx;
+          border-radius: 999rpx;
+        }
+
+        .therapy-duration {
+          font-size: 22rpx;
+          color: #9a8e7e;
+        }
+      }
+    }
+
+    .therapy-right {
+      .therapy-seats {
+        font-size: 24rpx;
+        color: @tcm-warm;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+/* ===== 生活常识 ===== */
+.life-list {
+  .life-row {
+    display: flex;
+    gap: 20rpx;
+    padding: 24rpx 0;
+    border-bottom: 1rpx solid @tcm-border;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .life-dot {
+      width: 12rpx;
+      height: 12rpx;
+      border-radius: 50%;
+      background: @tcm-warm;
+      margin-top: 14rpx;
+      flex-shrink: 0;
+    }
+
+    .life-body {
+      flex: 1;
+
+      .life-title {
+        font-size: 30rpx;
+        font-weight: 600;
+        color: @tcm-dark;
+        margin-bottom: 6rpx;
+      }
+
+      .life-summary {
+        font-size: 26rpx;
+        color: #7a6e60;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+/* ===== 知识快报 ===== */
+.feed-list {
+  .feed-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24rpx 0;
+    border-bottom: 1rpx solid @tcm-border;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .feed-left {
+      flex: 1;
+      padding-right: 20rpx;
+
+      .feed-tag {
+        display: inline-block;
+        font-size: 20rpx;
+        color: @tcm-brown;
+        background: @tcm-light;
+        padding: 2rpx 12rpx;
+        border-radius: 999rpx;
+        margin-bottom: 8rpx;
+      }
+
+      .feed-title {
+        font-size: 28rpx;
+        color: @tcm-dark;
+        line-height: 1.4;
+      }
+    }
+
+    .feed-time {
+      font-size: 22rpx;
+      color: #9a8e7e;
+      white-space: nowrap;
+      margin-top: 28rpx;
+    }
+  }
+}
+
+/* ===== 药膳教学入口 ===== */
+.teaching-row {
+  position: relative;
+  height: 180rpx;
+  margin: 0 24rpx 32rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+
+  .teaching-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .teaching-mask {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(61, 50, 41, 0.75) 0%, rgba(61, 50, 41, 0.3) 100%);
+  }
+
+  .teaching-content {
+    position: relative;
+    padding: 0 32rpx;
+    color: #fff;
+    flex: 1;
+
+    .teaching-title {
+      font-size: 32rpx;
       font-weight: 600;
-      color: #1f1f1f;
       margin-bottom: 8rpx;
     }
 
-    .summary-desc {
-      font-size: 28rpx;
-      color: #404040;
-      line-height: 1.7;
-    }
-  }
-}
-
-.focus-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-
-  .focus-tag {
-    background: #f7fbff;
-    color: #3583ff;
-    border-radius: 999rpx;
-    padding: 10rpx 20rpx;
-    font-size: 24rpx;
-  }
-}
-
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
-
-  .quick-item {
-    background: #fff;
-    border-radius: 24rpx;
-    padding: 24rpx;
-    box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.04);
-
-    .quick-icon {
-      font-size: 44rpx;
-    }
-
-    .quick-title {
-      font-size: 28rpx;
-      font-weight: 600;
-      margin: 8rpx 0;
-    }
-
-    .quick-desc {
+    .teaching-desc {
       font-size: 24rpx;
-      color: #8c8c8c;
-    }
-  }
-}
-
-.recipe-card,
-.life-item,
-.feed-item,
-.nav-item {
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 28rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 8rpx 24rpx rgba(36, 61, 93, 0.06);
-}
-
-.recipe-card {
-  border: 1rpx solid #e7ecff;
-
-  .recipe-head {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10rpx;
-
-    .recipe-title {
-      font-size: 32rpx;
-      font-weight: 600;
-    }
-
-    .recipe-tag {
-      font-size: 24rpx;
-      color: #5d7bff;
+      opacity: 0.9;
     }
   }
 
-  .recipe-focus {
-    font-size: 26rpx;
-    color: #4d5a7a;
-    margin-bottom: 8rpx;
-  }
-
-  .recipe-ingredients {
-    font-size: 24rpx;
-    color: #8b93a7;
+  .teaching-arrow {
+    position: relative;
+    font-size: 48rpx;
+    color: #fff;
+    padding-right: 32rpx;
+    opacity: 0.8;
   }
 }
 
-.teaching-card {
-  background: linear-gradient(135deg, #eef2ff 0%, #fef9ff 100%);
-  border-radius: 24rpx;
-  padding: 28rpx;
-  box-shadow: 0 8rpx 24rpx rgba(36, 61, 93, 0.08);
-
-  .teaching-title {
-    font-size: 30rpx;
-    font-weight: 600;
-    color: #2b2e66;
-    margin-bottom: 8rpx;
-  }
-
-  .teaching-desc {
-    font-size: 26rpx;
-    color: #5c6192;
-    margin-bottom: 12rpx;
-  }
-
-  .teaching-link {
-    font-size: 24rpx;
-    color: #5d7bff;
-  }
-}
-
-.life-item {
-  border: 1rpx solid #f2f2f2;
-
-  .life-title {
-    font-size: 30rpx;
-    font-weight: 600;
-    margin-bottom: 8rpx;
-  }
-
-  .life-summary {
-    font-size: 26rpx;
-    color: #5c5c5c;
-    line-height: 1.6;
-  }
-}
-
-.feed-item {
-  .feed-title {
-    font-size: 28rpx;
-    color: #1a1a1a;
-    margin-bottom: 8rpx;
-  }
-
-  .feed-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 24rpx;
-    color: #7d7d7d;
-  }
-
-  .feed-tag {
-    background: #fdf4e7;
-    color: #ff8a00;
-    padding: 4rpx 16rpx;
-    border-radius: 999rpx;
-  }
-}
-
-.nav-modules .nav-item {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-
-  .nav-icon {
-    width: 92rpx;
-    height: 92rpx;
-    border-radius: 24rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 44rpx;
-    background: #f7f8ff;
-  }
-
-  .nav-content {
-    flex: 1;
-  }
-
-  .nav-title {
-    font-size: 30rpx;
-    font-weight: 600;
-  }
-
-  .nav-desc {
-    font-size: 24rpx;
-    color: #7d7d7d;
-    margin-top: 6rpx;
-  }
-
-  .nav-arrow {
-    font-size: 40rpx;
-    color: #d8d8d8;
-  }
-}
-
-.page-bottom-placeholder {
-  height: 80rpx;
+.page-bottom {
+  height: 40rpx;
 }

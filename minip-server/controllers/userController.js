@@ -1,4 +1,6 @@
 const { body, validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
 const db = require('../models');
 
 // ========== 获取用户资料 ==========
@@ -66,8 +68,32 @@ async function updateAvatar(req, res) {
     if (!user) {
       return res.status(404).json({ code: 404, message: '用户不存在', data: null });
     }
-    await user.update({ avatar_url: avatarUrl });
-    res.json({ code: 200, message: '头像更新成功', data: { avatarUrl: user.avatar_url } });
+
+    let finalUrl = avatarUrl;
+
+    // 如果是 base64 图片数据，保存为文件
+    if (avatarUrl.startsWith('data:image')) {
+      const base64Data = avatarUrl.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      const ext = avatarUrl.match(/data:image\/(\w+);base64/)?.[1] || 'png';
+      const filename = `avatar_${req.user.id}_${Date.now()}.${ext}`;
+
+      const avatarDir = path.join(__dirname, '../static/avatars');
+      if (!fs.existsSync(avatarDir)) {
+        fs.mkdirSync(avatarDir, { recursive: true });
+      }
+
+      const filepath = path.join(avatarDir, filename);
+      fs.writeFileSync(filepath, buffer);
+
+      // 生成完整访问 URL
+      const host = req.get('host');
+      const protocol = req.protocol || 'http';
+      finalUrl = `${protocol}://${host}/static/avatars/${filename}`;
+    }
+
+    await user.update({ avatar_url: finalUrl });
+    res.json({ code: 200, message: '头像更新成功', data: { avatarUrl: finalUrl } });
   } catch (err) {
     res.status(500).json({ code: 500, message: err.message, data: null });
   }
@@ -223,19 +249,22 @@ async function getExerciseRecords(req, res) {
 // 保存运动记录
 async function saveExerciseRecord(req, res) {
   try {
-    const { date, type, duration, calories, details } = req.body;
+    const { date, type, duration, calories, steps, details } = req.body;
     if (!date) {
       return res.status(400).json({ code: 400, message: '缺少日期', data: null });
     }
 
-    const [record, created] = await db.ExerciseRecord.upsert({
+    const upsertData = {
       user_id: req.user.id,
       date,
       type: type || 'general',
       duration: duration || 0,
       calories: calories || 0,
+      steps: steps || 0,
       details: details || {},
-    });
+    };
+
+    const [record, created] = await db.ExerciseRecord.upsert(upsertData);
 
     res.json({ code: 200, message: created ? '创建成功' : '更新成功', data: record });
   } catch (err) {

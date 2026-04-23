@@ -150,6 +150,12 @@ export function clearLoginData() {
     wx.removeStorageSync('access_token');
     wx.removeStorageSync('refresh_token');
     wx.removeStorageSync('user_info');
+    // 退出登录时同步清除用户绑定的积分数据（未登录不应显示积分）
+    wx.removeStorageSync('user_points');
+    wx.removeStorageSync('points_history');
+    wx.removeStorageSync('total_donated_points');
+    wx.removeStorageSync('total_donation_count');
+    wx.removeStorageSync('donation_history');
     console.log('已清除登录数据');
     return true;
   } catch (error) {

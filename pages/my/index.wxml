@@ -1,13 +1,16 @@
 <t-toast id="t-toast" />
 
 <view class="my-page">
-  <image class="hero-bg" src="/static/bg_navbar.png" mode="widthFix" />
+  <view class="top-gradient" />
 
   <view class="profile-card">
     <view class="user-info">
       <view class="avatar-shell" bindtap="{{isLoad ? 'onNavigateTo' : 'onLogin'}}">
-        <image wx:if="{{isLoad && personalInfo.image}}" src="{{personalInfo.image}}" mode="aspectFill" />
-        <view class="avatar-placeholder" wx:else>👤</view>
+        <image wx:if="{{isLoad && personalInfo.image && !avatarError}}" src="{{personalInfo.image}}" mode="aspectFill" binderror="onAvatarError" />
+        <view class="avatar-placeholder {{isLoad && personalInfo.name ? 'gradient' : ''}}" wx:else>
+          <text wx:if="{{isLoad && personalInfo.name}}">{{personalInfo.name[0]}}</text>
+          <text wx:else>👤</text>
+        </view>
       </view>
       <view class="user-meta">
         <view class="user-name">{{isLoad ? personalInfo.name : '未登录用户'}}</view>
@@ -18,7 +21,7 @@
           <view class="action-btn primary" bindtap="{{isLoad ? 'onNavigateTo' : 'onLogin'}}">
             {{isLoad ? '编辑资料' : '微信快捷登录'}}
           </view>
-          <view class="action-btn ghost" bindtap="onCheckPoints">积分记录</view>
+          <view class="action-btn ghost" wx:if="{{isLoad}}" bindtap="onCheckPoints">积分记录</view>
         </view>
       </view>
     </view>
@@ -139,7 +142,7 @@
     </view>
     <view class="section-title">积分兑换 / 公益捐赠</view>
     <view class="redeem-grid">
-      <view class="redeem-item" wx:for="{{pointsPlaybook.redeemList}}" wx:key="title">
+      <view class="redeem-item" wx:for="{{pointsPlaybook.redeemList}}" wx:key="title" data-index="{{index}}" bindtap="onRedeem">
         <view class="redeem-title">{{item.title}}</view>
         <view class="redeem-desc">{{item.desc}}</view>
         <view class="redeem-points">{{item.cost}}</view>

@@ -4,7 +4,7 @@
   "libVersion": "3.11.3",
   "projectname": "miniprogram-starter",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "coverView": true,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": false,

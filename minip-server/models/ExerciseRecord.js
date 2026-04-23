@@ -31,6 +31,11 @@ module.exports = (sequelize) => {
       defaultValue: 0,
       comment: '消耗卡路里',
     },
+    steps: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      comment: '步数',
+    },
     details: {
       type: DataTypes.JSON,
       defaultValue: {},

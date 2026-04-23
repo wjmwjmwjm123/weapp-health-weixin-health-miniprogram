@@ -8,6 +8,7 @@ Page({
 
   data: {
     isLoad: false,
+    avatarError: false,
     personalInfo: {},
     mbtiProfile: {
       type: 'INFP',
@@ -135,6 +136,7 @@ Page({
 
       this.setData({
         isLoad: true,
+        avatarError: false,
         personalInfo: {
           name: nickName,
           image: avatarUrl,
@@ -143,8 +145,8 @@ Page({
         },
       });
 
-      let points = profile ? profile.points : (wx.getStorageSync('user_points') || 0);
-      // 同步积分（前后端取较大值）
+      // 优先读取本地积分，再同步后端
+      let points = getPoints();
       try {
         points = await syncPointsFromBackend();
       } catch (err) {
@@ -155,8 +157,12 @@ Page({
       this.loadAllBadges();
     } else {
       this.setData({ isLoad: false, personalInfo: {}, displayedBadges: [] });
-      this.updatePointsData(0);
+      this.updatePointsData(getPoints());
     }
+  },
+
+  onAvatarError() {
+    this.setData({ avatarError: true, 'personalInfo.image': '' });
   },
 
   onLogin(e) {
@@ -207,19 +213,15 @@ Page({
             source: 'charity-donate',
             project: this.data.pointsPlaybook.charityProject.title,
           });
-          
-          // 获取累计捐赠的积分（从存储中读取，如果没有则使用当前值）
+
+          // 更新累计捐赠
           const totalDonatedKey = 'total_donated_points';
           const currentTotalDonated = wx.getStorageSync(totalDonatedKey) || 0;
           const newTotalDonated = currentTotalDonated + cost;
           wx.setStorageSync(totalDonatedKey, newTotalDonated);
-          
-          // 更新积分显示（会自动重新计算charity等数据）
+
+          // 更新页面数据（此时 totalDonated 已是最新）
           this.updatePointsData(remainingPoints);
-          
-          // 更新累计捐赠统计
-          const newCharityAmount = (newTotalDonated * 0.01).toFixed(2); // 转换为元
-          const newDonatedAnimals = Math.max(0, Math.floor(newTotalDonated / 5)); // 每5积分=1只动物
           
           // 更新成就进度
           // 获取累计捐赠次数
@@ -262,14 +264,6 @@ Page({
               }
             }
           }
-          
-          this.setData({
-            pointsPlaybook: {
-              ...this.data.pointsPlaybook,
-              charityAmount: newCharityAmount,
-              donatedAnimals: newDonatedAnimals,
-            },
-          });
           
           this.onShowToast('#t-toast', `捐赠成功！已扣除${cost}积分，感谢你的善意！`);
         }
@@ -461,6 +455,46 @@ Page({
     this.onShowToast('#t-toast', '充值中心即将上线');
   },
 
+  onRedeem(e) {
+    const { index } = e.currentTarget.dataset;
+    const item = this.data.pointsPlaybook.redeemList[index];
+    if (!item) return;
+
+    // 解析所需积分
+    let cost = 0;
+    const costMatch = item.cost.match(/(\d+)/);
+    if (costMatch) {
+      cost = parseInt(costMatch[1], 10);
+    }
+    if (cost <= 0) {
+      this.onShowToast('#t-toast', '兑换项暂不可用');
+      return;
+    }
+
+    const currentPoints = getPoints();
+    if (currentPoints < cost) {
+      this.onShowToast('#t-toast', `积分不足，需要${cost}积分，当前只有${currentPoints}积分`);
+      return;
+    }
+
+    wx.showModal({
+      title: '确认兑换',
+      content: `确定要兑换「${item.title}」吗？\n将消耗 ${cost} 积分`,
+      confirmText: '确认兑换',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          const remaining = spendPoints(cost, `兑换：${item.title}`, {
+            source: 'redeem',
+            item: item.title,
+          });
+          this.updatePointsData(remaining);
+          this.onShowToast('#t-toast', `兑换成功！已扣除${cost}积分`);
+        }
+      },
+    });
+  },
+
   onGoSetting() {
     wx.navigateTo({
       url: '/pages/setting/index',
@@ -472,8 +506,9 @@ Page({
   },
 
   updatePointsData(points) {
-    const baseCharity = Math.max(0, Math.floor(points * 0.35));
-    
+    // 公益余额 = 总积分（所有积分均可用于公益/兑换）
+    const baseCharity = Math.max(0, points);
+
     // 累计捐赠的积分和金额（从存储中读取）
     const totalDonatedKey = 'total_donated_points';
     const totalDonated = wx.getStorageSync(totalDonatedKey) || 0;
@@ -509,7 +544,7 @@ Page({
       if (item.type === 'earn') {
         return sum + amount;
       }
-      if (item.type === 'spend') {
+      if (item.type === 'spend' || item.type === 'deduct') {
         return sum - amount;
       }
       return sum;
