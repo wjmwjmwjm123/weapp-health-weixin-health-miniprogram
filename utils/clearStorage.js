@@ -4,7 +4,7 @@
 export function clearCacheOnly() {
   try {
     // 需要保留的键（登录相关）
-    const preserveKeys = ['access_token', 'user_info'];
+    const preserveKeys = ['access_token', 'refresh_token', 'user_info'];
     
     // 清除缓存相关的存储键
     const cacheKeys = [
@@ -80,6 +80,7 @@ export function clearAllStorage() {
     // 清除所有可能的存储键
     const keys = [
       'access_token',
+      'refresh_token',
       'user_info',
       'user_points',
       'user_plan_data',
@@ -147,6 +148,7 @@ export function clearAllStorage() {
 export function clearLoginData() {
   try {
     wx.removeStorageSync('access_token');
+    wx.removeStorageSync('refresh_token');
     wx.removeStorageSync('user_info');
     console.log('已清除登录数据');
     return true;

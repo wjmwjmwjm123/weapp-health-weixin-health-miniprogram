@@ -1,30 +1,15 @@
 <view class="wechat-login-container">
   <view class="login-header">
     <view class="login-logo">🏃‍♀️</view>
-    <view class="login-title">欢迎使用健身助手</view>
+    <view class="login-title">欢迎使用纤途无忧</view>
     <view class="login-subtitle">记录你的每一次努力</view>
   </view>
 
   <view class="login-content">
-    <!-- 微信登录按钮（完整版） -->
+    <!-- 微信一键登录 -->
     <view class="login-button primary" bindtap="onWechatLogin">
       <view class="button-icon">🔐</view>
-      <text class="button-text">微信一键登录</text>
-      <text class="button-desc">获取头像和昵称</text>
-    </view>
-
-    <!-- 简化登录按钮 -->
-    <view class="login-button secondary" bindtap="onSimpleLogin">
-      <view class="button-icon">⚡</view>
-      <text class="button-text">快速登录</text>
-      <text class="button-desc">无需授权，直接使用</text>
-    </view>
-
-    <!-- 手机号登录 -->
-    <view class="login-button outline" bindtap="onPhoneLogin">
-      <view class="button-icon">📱</view>
-      <text class="button-text">手机号登录</text>
-      <text class="button-desc">使用手机号验证码登录</text>
+      <text class="button-text">{{loading ? '登录中...' : '微信一键登录'}}</text>
     </view>
   </view>
 
@@ -43,4 +28,3 @@
     </view>
   </view>
 </view>
-

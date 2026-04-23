@@ -1,3 +1,9 @@
+import request from '~/api/request';
+
+/**
+ * 积分工具类
+ * 后端优先 + 本地回退
+ */
 const POINTS_KEY = 'user_points';
 const HISTORY_KEY = 'points_history';
 const HISTORY_LIMIT = 100;
@@ -60,6 +66,38 @@ function emitPointsChange(points) {
   }
 }
 
+/**
+ * 从后端同步积分（取本地与后端较大值）
+ */
+export async function syncPointsFromBackend() {
+  try {
+    const localPoints = getPoints();
+    const res = await request(`/api/user/points?points=${localPoints}`, 'GET');
+    if (res.code === 200 && typeof res.data?.points === 'number') {
+      const backendPoints = res.data.points;
+      const finalPoints = Math.max(localPoints, backendPoints);
+      if (finalPoints !== localPoints) {
+        setPoints(finalPoints);
+      }
+      return finalPoints;
+    }
+  } catch (err) {
+    console.warn('同步积分失败:', err.message);
+  }
+  return getPoints();
+}
+
+/**
+ * 尝试同步积分到后端
+ */
+async function syncToBackend(type, amount, desc) {
+  try {
+    await request('/api/user/points', 'POST', { type, amount, desc });
+  } catch (err) {
+    console.warn('积分同步后端失败，仅保存本地:', err.message);
+  }
+}
+
 export function getPoints() {
   return safeNumber(wx.getStorageSync(POINTS_KEY), 0);
 }
@@ -83,6 +121,8 @@ export function addPoints(amount, desc = '获得积分', extra = {}) {
     extra,
   }));
   emitPointsChange(updated);
+  // 异步同步后端
+  syncToBackend('earn', delta, desc);
   return updated;
 }
 
@@ -98,6 +138,7 @@ export function deductPoints(amount, desc = '积分扣除', extra = {}) {
     extra,
   }));
   emitPointsChange(updated);
+  syncToBackend('deduct', delta, desc);
   return updated;
 }
 
@@ -113,6 +154,7 @@ export function spendPoints(amount, desc = '积分消耗', extra = {}) {
     extra,
   }));
   emitPointsChange(updated);
+  syncToBackend('spend', delta, desc);
   return updated;
 }
 
@@ -124,4 +166,3 @@ export function clearPointsData() {
   wx.removeStorageSync(POINTS_KEY);
   wx.removeStorageSync(HISTORY_KEY);
 }
-

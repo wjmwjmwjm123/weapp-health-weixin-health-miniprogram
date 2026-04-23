@@ -22,7 +22,7 @@ async function authMiddleware(req, res, next) {
     if (!user || decoded.tokenVersion !== user.token_version) {
       return res.status(401).json({ code: 401, message: '登录已过期，请重新登录', data: null });
     }
-    req.user = decoded; // { id, role, tokenVersion }
+    req.user = decoded; // { id, tokenVersion }
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {

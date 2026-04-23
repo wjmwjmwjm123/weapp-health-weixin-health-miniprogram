@@ -1,4 +1,5 @@
 import useToastBehavior from '~/behaviors/useToast';
+import request from '~/api/request';
 import { clearCacheOnly, clearLoginData } from '~/utils/clearStorage';
 
 Page({
@@ -153,8 +154,15 @@ Page({
       confirmText: '确定退出',
       cancelText: '取消',
       confirmColor: '#ff4444',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
+          // 尝试通知后端登出（使令牌失效）
+          try {
+            await request('/api/auth/logout', 'POST');
+          } catch (err) {
+            console.warn('后端登出失败:', err.message);
+          }
+
           // 清除登录数据
           clearLoginData();
           

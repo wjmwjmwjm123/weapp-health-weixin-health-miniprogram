@@ -10,17 +10,18 @@ async function syncDB() {
     await db.sequelize.sync({ alter: true });
     console.log('数据库表结构同步完成');
 
-    // 创建默认管理员
-    const admin = await db.User.findOne({ where: { role: 'admin' } });
-    if (!admin) {
-      const bcrypt = require('bcryptjs');
-      await db.User.create({
-        phone: 'admin',
-        password_hash: await bcrypt.hash('admin123', 10),
-        nickname: '管理员',
-        role: 'admin',
-      });
-      console.log('已创建默认管理员账号: admin / admin123');
+    // 初始化商品数据（如果表为空）
+    const productCount = await db.Product.count();
+    if (productCount === 0) {
+      await db.Product.bulkCreate([
+        { name: '高级HIIT课程包', price: 99.00, original_price: 199.00, desc: '包含10个高级HIIT课程，燃脂塑形', type: 'course' },
+        { name: '瑜伽完整课程', price: 88.00, original_price: 168.00, desc: '30天瑜伽训练计划，柔韧提升', type: 'course' },
+        { name: '智能手环', price: 199.00, original_price: 299.00, desc: '运动心率监测，睡眠分析', type: 'equipment' },
+        { name: '瑜伽垫加厚款', price: 68.00, original_price: 128.00, desc: '6mm加厚防滑，环保TPE材质', type: 'equipment' },
+        { name: '黄芪山药燕麦粥料包', price: 35.00, desc: '健脾益气，适合早晨空腹', type: 'tcm' },
+        { name: '荷叶陈皮清脂茶', price: 28.00, desc: '祛湿化浊，午后代谢茶', type: 'tcm' },
+      ]);
+      console.log('已初始化默认商品数据');
     }
 
     console.log('初始化完成');

@@ -190,6 +190,19 @@ Page({
       newData.points = newPoints;
     }
     this.setData(newData);
+
+    // 异步同步任务完成状态到后端
+    if (!alreadyDone) {
+      const today = formatDateStr();
+      const taskPoints = taskId === 'checkin' ? 5 : 0;
+      try {
+        request('/api/user/daily-task/complete', 'POST', {
+          date: today,
+          taskId,
+          points: taskPoints,
+        }).catch(err => console.warn('任务同步后端失败:', err.message));
+      } catch (e) { /* ignore */ }
+    }
   },
 
   onLoad() {
@@ -263,32 +276,60 @@ Page({
     const points = getPoints();
     const today = formatDateStr();
     const taskKey = this.getTodayTaskKey(today);
-    const savedTask = wx.getStorageSync(taskKey);
-    let todayTask = normalizeTaskState(savedTask);
+
+    // 尝试从后端获取今日任务
+    let todayTask = null;
+    if (isLoggedIn()) {
+      try {
+        const res = await request('/api/user/daily-task', 'GET', { date: today });
+        if (res.code === 200 && res.data && res.data.tasks) {
+          todayTask = normalizeTaskState(res.data);
+          wx.setStorageSync(taskKey, todayTask);
+        }
+      } catch (err) {
+        console.warn('后端获取任务失败，使用本地缓存:', err.message);
+      }
+    }
+
+    if (!todayTask) {
+      const savedTask = wx.getStorageSync(taskKey);
+      todayTask = normalizeTaskState(savedTask);
+    }
     let pointsAfterTask = points;
     if (isLoggedIn()) {
       const alreadyCheckin = todayTask.tasks && todayTask.tasks.checkin;
       todayTask = completeTask(todayTask, 'checkin');
       if (!alreadyCheckin) {
         pointsAfterTask = this.addTaskPoints(5, '每日签到');
-        
+
+        // 同步签到状态到后端
+        try {
+          request('/api/user/daily-task/complete', 'POST', {
+            date: today,
+            taskId: 'checkin',
+            points: 5,
+          }).catch((err) => console.warn('签到同步后端失败:', err.message));
+        } catch (e) {
+          /* ignore */
+        }
+
         // 更新成就进度
         const unlockedBadge = updateBadgeProgress('checkin_1'); // 初次签到
         if (unlockedBadge) {
           triggerBadgeUnlock(unlockedBadge);
         }
-        
+
         // 获取累计签到天数
         const checkinHistory = wx.getStorageSync('checkin_history') || [];
         checkinHistory.push(today);
         // 去重并排序
         const uniqueCheckins = [...new Set(checkinHistory)].sort();
         wx.setStorageSync('checkin_history', uniqueCheckins);
-        
+
         const checkinCount = uniqueCheckins.length;
         updateBadgeProgress('checkin_2', Math.min(checkinCount, 30)); // 签到达人
         updateBadgeProgress('checkin_3', Math.min(checkinCount, 100)); // 签到之王
-        
+
         // 检查连续签到
         if (uniqueCheckins.length >= 2) {
           const last7Days = uniqueCheckins.slice(-7);

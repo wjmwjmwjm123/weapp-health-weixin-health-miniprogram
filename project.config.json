@@ -7,7 +7,7 @@
   "setting": {
     "bundle": false,
     "userConfirmedBundleSwitch": false,
-    "urlCheck": true,
+    "urlCheck": false,
     "scopeDataCheck": false,
     "coverView": true,
     "es6": true,
@@ -53,7 +53,7 @@
   },
   "compileType": "miniprogram",
   "libVersion": "3.11.3",
-  "appid": "wx85006c850dc6a477",
+  "appid": "wx99e79af112a5ccd7",
   "projectname": "miniprogram-starter",
   "condition": {
     "miniprogram": {

@@ -24,8 +24,13 @@ const db = {};
 
 // 加载模型
 db.User = require('./User')(sequelize);
-db.Merchant = require('./Merchant')(sequelize);
 db.UserAddress = require('./UserAddress')(sequelize);
+db.Product = require('./Product')(sequelize);
+db.CartItem = require('./CartItem')(sequelize);
+db.PointsHistory = require('./PointsHistory')(sequelize);
+db.DailyTask = require('./DailyTask')(sequelize);
+db.ExerciseRecord = require('./ExerciseRecord')(sequelize);
+db.BodyData = require('./BodyData')(sequelize);
 
 // 建立关联
 Object.keys(db).forEach((modelName) => {

@@ -50,16 +50,16 @@ Page({
   getPersonalInfo() {
     // 优先使用微信登录的用户信息
     const userInfo = wx.getStorageSync('user_info');
-    if (userInfo && (userInfo.nickName || userInfo.nickname || userInfo.avatarUrl || userInfo.avatar)) {
-      // 使用微信登录的用户信息
+    if (userInfo && (userInfo.nickName || userInfo.nickname)) {
       const personInfo = {
         name: userInfo.nickName || userInfo.nickname || '微信用户',
         gender: userInfo.gender || 0,
         birth: userInfo.birth || '',
         address: userInfo.address || [],
-        introduction: userInfo.introduction || '',
+        introduction: userInfo.brief || userInfo.introduction || '',
         photos: userInfo.photos || [],
         image: userInfo.avatarUrl || userInfo.avatar || '',
+        star: userInfo.star || '',
       };
       
       this.setData(
@@ -76,8 +76,7 @@ Page({
         },
       );
     } else {
-      // 如果没有微信登录信息，使用空数据
-              this.setData({
+      this.setData({
         personInfo: {
           name: '',
           gender: 0,
@@ -86,6 +85,7 @@ Page({
           introduction: '',
           photos: [],
           image: '',
+          star: '',
         },
       });
     }
@@ -195,35 +195,70 @@ Page({
     });
   },
 
-  onSaveInfo() {
+  async onSaveInfo() {
     const { personInfo } = this.data;
     
-    // 保存用户信息到本地存储
-    const userInfo = wx.getStorageSync('user_info') || {};
-    const updatedUserInfo = {
-      ...userInfo,
-      nickName: personInfo.name,
+    // 构造后端更新数据
+    const updateData = {
       nickname: personInfo.name,
-      avatarUrl: personInfo.image || userInfo.avatarUrl || userInfo.avatar,
-      avatar: personInfo.image || userInfo.avatarUrl || userInfo.avatar,
       gender: personInfo.gender,
-      birth: personInfo.birth,
-      address: personInfo.address,
-      introduction: personInfo.introduction,
-      photos: personInfo.photos,
+      birth: personInfo.birth || null,
+      brief: personInfo.introduction,
+      star: personInfo.star || '',
     };
-    
-    wx.setStorageSync('user_info', updatedUserInfo);
-    
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success',
-      duration: 1500,
-    });
-    
-    // 延迟返回上一页
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 1500);
+
+    // 处理地区
+    if (personInfo.address && personInfo.address.length >= 2) {
+      updateData.province = areaList.provinces[personInfo.address[0]] || '';
+      updateData.city = areaList.cities[personInfo.address[1]] || '';
+    }
+
+    try {
+      const res = await request('/api/user/profile', 'PUT', updateData);
+      if (res.code === 200) {
+        // 同时更新本地缓存
+        const userInfo = wx.getStorageSync('user_info') || {};
+        const updatedUserInfo = {
+          ...userInfo,
+          nickName: personInfo.name,
+          nickname: personInfo.name,
+          avatarUrl: personInfo.image || userInfo.avatarUrl || userInfo.avatar,
+          avatar: personInfo.image || userInfo.avatarUrl || userInfo.avatar,
+          gender: personInfo.gender,
+          birth: personInfo.birth,
+          address: personInfo.address,
+          brief: personInfo.introduction,
+          introduction: personInfo.introduction,
+          photos: personInfo.photos,
+          star: personInfo.star,
+        };
+        wx.setStorageSync('user_info', updatedUserInfo);
+
+        wx.showToast({ title: '保存成功', icon: 'success', duration: 1500 });
+        setTimeout(() => { wx.navigateBack(); }, 1500);
+      } else {
+        wx.showToast({ title: res.message || '保存失败', icon: 'none' });
+      }
+    } catch (err) {
+      // 后端不可用时，仅保存本地
+      const userInfo = wx.getStorageSync('user_info') || {};
+      const updatedUserInfo = {
+        ...userInfo,
+        nickName: personInfo.name,
+        nickname: personInfo.name,
+        avatarUrl: personInfo.image || userInfo.avatarUrl || userInfo.avatar,
+        avatar: personInfo.image || userInfo.avatarUrl || userInfo.avatar,
+        gender: personInfo.gender,
+        birth: personInfo.birth,
+        address: personInfo.address,
+        brief: personInfo.introduction,
+        introduction: personInfo.introduction,
+        photos: personInfo.photos,
+        star: personInfo.star,
+      };
+      wx.setStorageSync('user_info', updatedUserInfo);
+      wx.showToast({ title: '已保存到本地', icon: 'success', duration: 1500 });
+      setTimeout(() => { wx.navigateBack(); }, 1500);
+    }
   },
 });

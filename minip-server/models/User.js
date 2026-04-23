@@ -18,17 +18,6 @@ module.exports = (sequelize) => {
       allowNull: true,
       comment: '微信unionid',
     },
-    phone: {
-      type: DataTypes.STRING(20),
-      unique: true,
-      allowNull: true,
-      comment: '手机号',
-    },
-    password_hash: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      comment: '密码哈希',
-    },
     nickname: {
       type: DataTypes.STRING(50),
       allowNull: true,
@@ -78,20 +67,15 @@ module.exports = (sequelize) => {
       defaultValue: 0,
       comment: '积分余额',
     },
-    role: {
-      type: DataTypes.ENUM('user', 'merchant', 'admin'),
-      defaultValue: 'user',
-      comment: '角色',
-    },
     token_version: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
-      comment: '令牌版本，登出/改密码时递增使旧令牌失效',
+      comment: '令牌版本，登出时递增使旧令牌失效',
     },
     session_key: {
       type: DataTypes.STRING(100),
       allowNull: true,
-      comment: '微信session_key（加密存储）',
+      comment: '微信session_key',
     },
   }, {
     tableName: 'users',
@@ -102,8 +86,12 @@ module.exports = (sequelize) => {
   });
 
   User.associate = (models) => {
-    User.hasOne(models.Merchant, { foreignKey: 'user_id', as: 'merchant' });
     User.hasMany(models.UserAddress, { foreignKey: 'user_id', as: 'addresses' });
+    User.hasMany(models.CartItem, { foreignKey: 'user_id', as: 'cartItems' });
+    User.hasMany(models.PointsHistory, { foreignKey: 'user_id', as: 'pointsHistory' });
+    User.hasMany(models.DailyTask, { foreignKey: 'user_id', as: 'dailyTasks' });
+    User.hasMany(models.ExerciseRecord, { foreignKey: 'user_id', as: 'exerciseRecords' });
+    User.hasMany(models.BodyData, { foreignKey: 'user_id', as: 'bodyData' });
   };
 
   return User;

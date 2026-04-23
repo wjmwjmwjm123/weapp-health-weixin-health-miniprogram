@@ -84,25 +84,25 @@ Page({
   },
 
   // 增加商品数量
-  onIncreaseQuantity(e) {
+  async onIncreaseQuantity(e) {
     const { id } = e.currentTarget.dataset;
     const { cartItems } = this.data;
     const item = cartItems.find(item => item.id === id);
-    
+
     if (item) {
-      cartUtil.updateQuantity(id, item.quantity + 1);
+      await cartUtil.updateQuantity(id, item.quantity + 1);
       this.loadCartData();
     }
   },
 
   // 减少商品数量
-  onDecreaseQuantity(e) {
+  async onDecreaseQuantity(e) {
     const { id } = e.currentTarget.dataset;
     const { cartItems } = this.data;
     const item = cartItems.find(item => item.id === id);
-    
+
     if (item && item.quantity > 1) {
-      cartUtil.updateQuantity(id, item.quantity - 1);
+      await cartUtil.updateQuantity(id, item.quantity - 1);
       this.loadCartData();
     }
   },
@@ -110,13 +110,13 @@ Page({
   // 删除商品
   onDeleteItem(e) {
     const { id } = e.currentTarget.dataset;
-    
+
     wx.showModal({
       title: '确认删除',
       content: '确定要从购物车中删除该商品吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          cartUtil.removeFromCart(id);
+          await cartUtil.removeFromCart(id);
           this.loadCartData();
           wx.showToast({
             title: '已删除',
@@ -132,9 +132,9 @@ Page({
     wx.showModal({
       title: '确认清空',
       content: '确定要清空购物车吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          cartUtil.clearCart();
+          await cartUtil.clearCart();
           this.setData({
             cartItems: [],
             totalPrice: 0,
@@ -159,7 +159,7 @@ Page({
   // 结算
   onCheckout() {
     const { selectedItems, cartItems } = this.data;
-    
+
     if (selectedItems.length === 0) {
       wx.showToast({
         title: '请选择商品',
@@ -167,29 +167,23 @@ Page({
       });
       return;
     }
-    
+
     const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.id));
-    
-    // 这里可以跳转到结算页面或调用支付接口
+
     wx.showModal({
       title: '结算',
       content: `共${selectedItems.length}件商品，总计${this.data.totalPrice}元`,
       confirmText: '去支付',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          // 模拟支付成功
-          // 实际项目中这里应该调用支付接口
           wx.showToast({
             title: '支付成功',
             icon: 'success',
           });
-          
+
           // 从购物车中移除已购买的商品
-          selectedItems.forEach(id => {
-            cartUtil.removeFromCart(id);
-          });
-          
-          // 重新加载购物车数据
+          await Promise.all(selectedItems.map(id => cartUtil.removeFromCart(id)));
+
           this.loadCartData();
         }
       },

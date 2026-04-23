@@ -59,7 +59,7 @@ Page({
     });
 
     try {
-      // 调用Moonshot AI接口
+      // 调用 DeepSeek AI 接口
       let aiResponse;
       if (this.data.aiProvider === 'custom') {
         aiResponse = await this.callCustomAI(inputValue);
@@ -104,13 +104,13 @@ Page({
   // ============ AI API 调用方法 ============
 
   /**
-   * 直接调用Moonshot AI接口
+   * 直接调用 DeepSeek AI 接口
    */
   async callCustomAI(question) {
     try {
-      // Moonshot API 配置
+      // DeepSeek API 配置（请替换为你自己的 API Key）
       const API_KEY = 'YOUR_DEEPSEEK_API_KEY';
-      const API_URL = 'https://api.moonshot.cn/v1/chat/completions';
+      const API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
       // 构建消息历史
 
@@ -138,7 +138,7 @@ Page({
             'Authorization': `Bearer ${API_KEY}`,
           },
           data: {
-            model: 'kimi-k2-turbo-preview',
+            model: 'deepseek-chat',
             messages: messages,
             temperature: 0.7,
             max_tokens: 1000,
@@ -159,7 +159,7 @@ Page({
 
       return res.data.answer || '抱歉，我无法理解您的问题。';
     } catch (error) {
-      throw new Error('AI接口调用失败：' + error.message);
+      throw new Error('DeepSeek 接口调用失败：' + error.message);
     }
   },
 

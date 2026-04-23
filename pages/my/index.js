@@ -1,5 +1,6 @@
 import useToastBehavior from '~/behaviors/useToast';
-import { getPoints, spendPoints } from '~/utils/points';
+import request from '~/api/request';
+import { getPoints, spendPoints, syncPointsFromBackend } from '~/utils/points';
 import { updateBadgeProgress, triggerBadgeUnlock } from '~/utils/badges';
 
 Page({
@@ -86,73 +87,74 @@ Page({
 
   async onShow() {
     const token = wx.getStorageSync('access_token');
-    const userInfo = wx.getStorageSync('user_info');
 
-    console.log('我的页面 - 检查登录状态:', { 
-      hasToken: !!token, 
-      hasUserInfo: !!userInfo,
-      userInfo: userInfo 
-    });
+    if (!token) {
+      // 未登录，显示登录提示
+      this.setData({ isLoad: false, personalInfo: {}, displayedBadges: [] });
+      this.updatePointsData(0);
+      return;
+    }
 
-    // 检查是否已登录（必须有token和userInfo）
-    if (token && userInfo) {
-      // 使用微信登录获取的用户信息
-      // 官方文档：wx.getUserProfile 返回的字段名是 nickName 和 avatarUrl（注意大小写）
-      // 参考：https://developers.weixin.qq.com/miniprogram/dev/api/open-api/user-info/wx.getUserProfile.html
-      
-      // 优先使用官方字段名
-      let nickName = userInfo.nickName || userInfo.nickname || '';
-      let avatarUrl = userInfo.avatarUrl || userInfo.avatar || '';
-      
-      console.log('=== 我的页面 - 解析用户信息 ===');
-      console.log('原始 userInfo:', userInfo);
-      console.log('nickName (官方):', userInfo.nickName);
-      console.log('avatarUrl (官方):', userInfo.avatarUrl);
-      console.log('nickname (兼容):', userInfo.nickname);
-      console.log('avatar (兼容):', userInfo.avatar);
-      console.log('最终 nickName:', nickName);
-      console.log('最终 avatarUrl:', avatarUrl);
-      
-      // 如果还是没有，说明数据有问题
-      if (!nickName) {
-        console.error('错误：未获取到昵称，所有字段都为空');
-        nickName = '微信用户'; // 降级处理
+    // 尝试从后端获取最新用户信息
+    let profile = null;
+    try {
+      const res = await request('/api/user/profile');
+      if (res.code === 200 && res.data) {
+        profile = res.data;
       }
-      if (!avatarUrl) {
-        console.error('错误：未获取到头像，所有字段都为空');
-        // 不设置默认值，让头像显示为默认图标
-      }
-      
-      // 注意：如果 nickName 是"微信用户"，可能是：
-      // 1. 用户没有设置微信昵称
-      // 2. 用户授权时选择了不提供昵称
-      // 3. 这是微信返回的默认值，是正常的
-      
-      // 显示用户信息（即使昵称是"微信用户"也正常显示，因为这是微信返回的真实数据）
+    } catch (err) {
+      console.warn('后端获取用户信息失败，使用本地缓存:', err.message);
+    }
+
+    // 后端失败则回退到本地缓存
+    let userInfo;
+    if (profile) {
+      userInfo = {
+        nickname: profile.nickname || '',
+        nickName: profile.nickname || '',
+        avatarUrl: profile.avatar_url || '',
+        avatar: profile.avatar_url || '',
+        gender: profile.gender || 0,
+        city: profile.city || '',
+        province: profile.province || '',
+        star: profile.star || '',
+        brief: profile.brief || '',
+        birth: profile.birth || '',
+        points: profile.points || 0,
+        role: profile.role || 'user',
+      };
+      // 同步更新本地缓存
+      wx.setStorageSync('user_info', userInfo);
+    } else {
+      userInfo = wx.getStorageSync('user_info') || {};
+    }
+
+    if (userInfo && (userInfo.nickName || userInfo.nickname)) {
+      const nickName = userInfo.nickName || userInfo.nickname || '微信用户';
+      const avatarUrl = userInfo.avatarUrl || userInfo.avatar || '';
+
       this.setData({
         isLoad: true,
         personalInfo: {
-          name: nickName, // 显示微信返回的昵称（即使是"微信用户"也是真实的）
-          image: avatarUrl, // 如果有头像就显示，没有就显示默认图标
+          name: nickName,
+          image: avatarUrl,
           star: userInfo.star || '健身达人',
           city: userInfo.city || userInfo.province || '未知',
         },
       });
 
-      const points = wx.getStorageSync('user_points') || 0;
+      let points = profile ? profile.points : (wx.getStorageSync('user_points') || 0);
+      // 同步积分（前后端取较大值）
+      try {
+        points = await syncPointsFromBackend();
+      } catch (err) {
+        console.warn('积分同步失败:', err.message);
+      }
       this.updatePointsData(points);
       this.loadDisplayedBadges();
       this.loadAllBadges();
-      
-      console.log('设置后的 personalInfo:', this.data.personalInfo);
     } else {
-      // 未登录，不显示用户信息，显示登录提示
-      console.log('我的页面 - 未登录状态');
-      this.setData({
-        isLoad: false,
-        personalInfo: {},
-        displayedBadges: [], // 未登录时清空成就展示
-      });
+      this.setData({ isLoad: false, personalInfo: {}, displayedBadges: [] });
       this.updatePointsData(0);
     }
   },

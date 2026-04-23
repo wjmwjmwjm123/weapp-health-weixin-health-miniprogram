@@ -24,21 +24,65 @@ Page({
   },
 
   // 加载今日记录
-  loadTodayRecord() {
+  async loadTodayRecord() {
     const { currentDate } = this.data;
+
+    // 尝试从后端获取
+    try {
+      const request = require('~/api/request').default;
+      const res = await request('/api/user/exercise', 'GET', { start: currentDate, end: currentDate });
+      if (res.code === 200 && res.data && res.data.length > 0) {
+        const backendRecord = res.data[0];
+        const records = {
+          weight: backendRecord.details?.weight || '',
+          calories: backendRecord.details?.calories || '',
+          sleep: backendRecord.details?.sleep || '',
+          period: backendRecord.details?.period || false,
+          exercise: String(backendRecord.duration || ''),
+          exerciseCalories: String(backendRecord.calories || ''),
+        };
+        this.setData({ records });
+        wx.setStorageSync(`record_${currentDate}`, records);
+        return;
+      }
+    } catch (err) {
+      console.warn('后端获取运动记录失败，使用本地缓存');
+    }
+
     const savedRecord = wx.getStorageSync(`record_${currentDate}`);
     if (savedRecord) {
-      this.setData({
-        records: savedRecord,
-      });
+      this.setData({ records: savedRecord });
     }
   },
 
   // 加载历史记录
-  loadHistory() {
-    // 获取最近7天的记录
-    const history = [];
+  async loadHistory() {
     const today = new Date();
+    const start = new Date(today);
+    start.setDate(start.getDate() - 6);
+    const startDate = `${start.getFullYear()}-${(start.getMonth() + 1).toString().padStart(2, '0')}-${start.getDate().toString().padStart(2, '0')}`;
+    const endDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+
+    // 尝试从后端获取
+    try {
+      const request = require('~/api/request').default;
+      const res = await request('/api/user/exercise', 'GET', { start: startDate, end: endDate });
+      if (res.code === 200 && res.data && res.data.length > 0) {
+        const history = res.data.map(r => ({
+          date: r.date,
+          weight: r.details?.weight || '',
+          calories: r.details?.calories || '',
+          exercise: String(r.duration || ''),
+        }));
+        this.setData({ historyRecords: history });
+        return;
+      }
+    } catch (err) {
+      console.warn('后端获取历史记录失败，使用本地缓存');
+    }
+
+    // 回退本地
+    const history = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
@@ -113,7 +157,6 @@ Page({
   saveRecord() {
     const { currentDate, records } = this.data;
     
-    // 确保数据格式正确
     const recordData = {
       weight: records.weight || '',
       calories: records.calories || '',
@@ -125,6 +168,25 @@ Page({
     
     wx.setStorageSync(`record_${currentDate}`, recordData);
     
+    // 异步同步到后端
+    try {
+      const request = require('~/api/request').default;
+      request('/api/user/exercise', 'POST', {
+        date: currentDate,
+        type: 'general',
+        duration: Number(records.exercise) || 0,
+        calories: Number(records.exerciseCalories) || 0,
+        details: recordData,
+      }).catch(err => console.warn('运动记录同步后端失败:', err.message));
+      // 同时同步身体数据
+      if (records.weight) {
+        request('/api/user/body-data', 'POST', {
+          date: currentDate,
+          weight: Number(records.weight) || null,
+        }).catch(err => console.warn('身体数据同步后端失败:', err.message));
+      }
+    } catch (e) { /* ignore */ }
+    
     // 如果记录了生理期，同步到全局记录中
     if (records.period) {
       const periodRecords = wx.getStorageSync('period_records') || [];
@@ -134,7 +196,6 @@ Page({
         wx.setStorageSync('period_records', periodRecords);
       }
     } else {
-      // 如果取消，从记录中移除
       const periodRecords = wx.getStorageSync('period_records') || [];
       const index = periodRecords.indexOf(currentDate);
       if (index > -1) {
@@ -143,13 +204,8 @@ Page({
       }
     }
     
-    wx.showToast({
-      title: '已保存',
-      icon: 'success',
-      duration: 1000,
-    });
+    wx.showToast({ title: '已保存', icon: 'success', duration: 1000 });
     
-    // 触发全局事件，通知首页更新
     const app = getApp();
     if (app.eventBus) {
       app.eventBus.emit('record-updated', recordData);

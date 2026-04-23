@@ -10,12 +10,29 @@ router.use(authMiddleware);
 router.get('/profile', user.getProfile);
 router.put('/profile', user.updateProfileValidation, user.updateProfile);
 router.put('/avatar', user.updateAvatar);
-router.put('/password', user.changePasswordValidation, user.changePassword);
 
-// 收货地址
-router.get('/addresses', user.getAddresses);
-router.post('/addresses', user.addressValidation, user.createAddress);
-router.put('/addresses/:id', user.updateAddressValidation, user.updateAddress);
-router.delete('/addresses/:id', user.deleteAddress);
+// 积分
+router.get('/points', user.syncPoints);
+router.post('/points', user.addPointsRecord);
+router.get('/points/history', user.getPointsHistory);
+
+// 每日任务
+router.get('/daily-task', user.getDailyTask);
+router.post('/daily-task/complete', user.completeTask);
+
+// 运动记录
+router.get('/exercise', user.getExerciseRecords);
+router.post('/exercise', user.saveExerciseRecord);
+
+// 身体数据
+router.get('/body-data', user.getBodyData);
+router.post('/body-data', user.saveBodyData);
+
+// 购物车
+router.get('/cart', user.getCart);
+router.post('/cart', user.addToCart);
+router.put('/cart/:id', user.updateCartItem);
+router.delete('/cart/:id', user.removeCartItem);
+router.delete('/cart', user.clearCart);
 
 module.exports = router;

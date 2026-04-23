@@ -1,3 +1,5 @@
+import request from '~/api/request';
+
 Page({
   data: {
     points: 0,
@@ -56,8 +58,26 @@ Page({
     this.setData({ points });
   },
 
-  loadPointsHistory() {
-    // 从存储加载积分历史
+  async loadPointsHistory() {
+    // 优先从后端获取积分历史
+    try {
+      const res = await request('/api/user/points/history', 'GET');
+      if (res.code === 200 && Array.isArray(res.data)) {
+        const history = res.data.map((item) => ({
+          id: item.id,
+          type: item.type,
+          amount: item.amount,
+          desc: item.desc,
+          time: item.created_at ? item.created_at.replace('T', ' ').substring(0, 16) : '',
+        }));
+        this.setData({ pointsHistory: history });
+        wx.setStorageSync('points_history', history);
+        return;
+      }
+    } catch (err) {
+      console.warn('后端获取积分历史失败，使用本地缓存:', err.message);
+    }
+    // 回退本地缓存
     const history = wx.getStorageSync('points_history') || this.data.pointsHistory;
     this.setData({ pointsHistory: history });
   },
