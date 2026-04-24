@@ -367,10 +367,22 @@ Page({
 
     // 读取今日记录数据（使用相同格式的日期）
     const todayRecord = wx.getStorageSync(`record_${today}`) || {};
+    // 兼容新格式的 exercises 数组
+    let exercises = todayRecord.exercises || [];
+    // 兼容旧数据
+    if (exercises.length === 0 && todayRecord.exercise) {
+      exercises = [{
+        type: 'general',
+        duration: Number(todayRecord.exercise) || 0,
+        calories: Number(todayRecord.exerciseCalories) || 0,
+      }];
+    }
+    const totalExerciseDuration = exercises.reduce((sum, e) => sum + (Number(e.duration) || 0), 0);
+    const totalExerciseCalories = exercises.reduce((sum, e) => sum + (Number(e.calories) || 0), 0);
     const todayData = {
       caloriesIn: parseFloat(todayRecord.calories) || 0,
-      caloriesOut: parseFloat(todayRecord.exerciseCalories) || 0,
-      exerciseTime: parseFloat(todayRecord.exercise) || 0,
+      caloriesOut: totalExerciseCalories,
+      exerciseTime: totalExerciseDuration,
       sleep: parseFloat(todayRecord.sleep) || 0,
     };
 

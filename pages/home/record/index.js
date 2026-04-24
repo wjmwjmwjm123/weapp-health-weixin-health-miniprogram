@@ -1,48 +1,122 @@
 import request from '~/api/request';
 
+// 运动类型配置
+const EXERCISE_TYPES = [
+  { key: 'walk', label: '步行', icon: '🚶', color: '#4CAF50' },
+  { key: 'run', label: '跑步', icon: '🏃', color: '#FF5722' },
+  { key: 'ride', label: '骑行', icon: '🚴', color: '#2196F3' },
+  { key: 'swim', label: '游泳', icon: '🏊', color: '#00BCD4' },
+  { key: 'rope', label: '跳绳', icon: '⛹️', color: '#E91E63' },
+  { key: 'yoga', label: '瑜伽', icon: '🧘', color: '#9C27B0' },
+  { key: 'fitness', label: '健身', icon: '💪', color: '#FF9800' },
+  { key: 'basketball', label: '篮球', icon: '🏀', color: '#795548' },
+  { key: 'badminton', label: '羽毛球', icon: '🏸', color: '#607D8B' },
+];
+
+// MET 值表（代谢当量）
+const MET_VALUES = {
+  walk: 3.5,
+  run: 8.0,
+  ride: 6.0,
+  swim: 6.0,
+  rope: 10.0,
+  yoga: 2.5,
+  fitness: 5.0,
+  basketball: 6.5,
+  badminton: 5.5,
+};
+
+// 根据运动类型、时长、体重计算消耗卡路里
+function calculateCalories(type, durationMinutes, weightKg = 60) {
+  const met = MET_VALUES[type] || 5.0;
+  return Math.round(met * weightKg * (durationMinutes / 60));
+}
+
 Page({
   data: {
     currentDate: '',
-    currentTab: 0, // 0: 今日, 1: 历史
+    currentTab: 0,
     records: {
-      weight: '', // 体重
-      calories: '', // 摄入卡路里
-      sleep: '', // 睡眠时长(小时)
-      period: false, // 是否生理期
-      exercise: '', // 运动时长(分钟)
-      exerciseCalories: '', // 运动消耗卡路里
+      weight: '',
+      calories: '',
+      sleep: '',
+      period: false,
+      exercises: [],
     },
     historyRecords: [],
+    totalExerciseCalories: 0,
+    totalExerciseDuration: 0,
+    exerciseTypes: EXERCISE_TYPES,
+    // 添加运动弹窗
+    showExerciseModal: false,
+    selectedExerciseType: '',
+    exerciseDuration: '',
+    exerciseCaloriesPreview: 0,
+    userWeight: 60,
+  },
+
+  // 计算并更新运动统计数据（总消耗 + 总时长）
+  updateExerciseStats(exercises) {
+    const list = exercises || [];
+    const totalCalories = list.reduce((sum, e) => sum + (Number(e.calories) || 0), 0);
+    const totalDuration = list.reduce((sum, e) => sum + (Number(e.duration) || 0), 0);
+    this.setData({ totalExerciseCalories: totalCalories, totalExerciseDuration: totalDuration });
+  },
+
+  // 阻止事件冒泡（弹窗用）
+  preventBubble() {
+    // do nothing
   },
 
   onLoad() {
     const today = new Date();
     const dateStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
-    this.setData({
-      currentDate: dateStr,
-    });
+    this.setData({ currentDate: dateStr });
+    this.loadUserWeight();
     this.loadTodayRecord();
     this.loadHistory();
+  },
+
+  // 加载用户体重（用于卡路里计算）
+  async loadUserWeight() {
+    try {
+      const planData = wx.getStorageSync('user_plan_data') || {};
+      if (planData.weight) {
+        this.setData({ userWeight: parseFloat(planData.weight) || 60 });
+        return;
+      }
+      const res = await request('/api/user/body-data', 'GET', { limit: 1 });
+      if (res.code === 200 && res.data && res.data.length > 0 && res.data[0].weight) {
+        this.setData({ userWeight: parseFloat(res.data[0].weight) || 60 });
+      }
+    } catch (err) {
+      console.warn('获取体重失败，使用默认值 60kg');
+    }
   },
 
   // 加载今日记录
   async loadTodayRecord() {
     const { currentDate } = this.data;
 
-    // 尝试从后端获取
     try {
       const res = await request('/api/user/exercise', 'GET', { start: currentDate, end: currentDate });
       if (res.code === 200 && res.data && res.data.length > 0) {
         const backendRecord = res.data[0];
-        const records = {
-          weight: backendRecord.details?.weight || '',
-          calories: backendRecord.details?.calories || '',
-          sleep: backendRecord.details?.sleep || '',
-          period: backendRecord.details?.period || false,
-          exercise: String(backendRecord.duration || ''),
-          exerciseCalories: String(backendRecord.calories || ''),
-        };
+        const details = backendRecord.details || {};
+
+        // 兼容旧数据：如果 details 中没有 exercises，但后端有 duration，则生成单条记录
+        let exercises = details.exercises || [];
+        if (exercises.length === 0 && backendRecord.duration > 0) {
+          exercises = [{
+            type: backendRecord.type || 'general',
+            duration: backendRecord.duration,
+            calories: backendRecord.calories || 0,
+          }];
+        }
+
+        const records = { exercises };
         this.setData({ records });
+        this.updateExerciseStats(exercises);
         wx.setStorageSync(`record_${currentDate}`, records);
         return;
       }
@@ -52,8 +126,30 @@ Page({
 
     const savedRecord = wx.getStorageSync(`record_${currentDate}`);
     if (savedRecord) {
-      this.setData({ records: savedRecord });
+      // 兼容旧数据格式
+      const records = this.migrateOldRecord(savedRecord);
+      this.setData({ records });
+      this.updateExerciseStats(records.exercises);
     }
+  },
+
+  // 兼容旧数据格式迁移
+  migrateOldRecord(savedRecord) {
+    const records = { ...savedRecord };
+    if (!records.exercises) {
+      records.exercises = [];
+      // 旧数据中有 exercise 和 exerciseCalories
+      if (savedRecord.exercise && Number(savedRecord.exercise) > 0) {
+        records.exercises.push({
+          type: 'general',
+          duration: Number(savedRecord.exercise) || 0,
+          calories: Number(savedRecord.exerciseCalories) || 0,
+        });
+      }
+      delete records.exercise;
+      delete records.exerciseCalories;
+    }
+    return records;
   },
 
   // 加载历史记录
@@ -64,16 +160,21 @@ Page({
     const startDate = `${start.getFullYear()}-${(start.getMonth() + 1).toString().padStart(2, '0')}-${start.getDate().toString().padStart(2, '0')}`;
     const endDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 
-    // 尝试从后端获取
     try {
       const res = await request('/api/user/exercise', 'GET', { start: startDate, end: endDate });
       if (res.code === 200 && res.data && res.data.length > 0) {
-        const history = res.data.map(r => ({
-          date: r.date,
-          weight: r.details?.weight || '',
-          calories: r.details?.calories || '',
-          exercise: String(r.duration || ''),
-        }));
+        const history = res.data.map(r => {
+          const details = r.details || {};
+          const exercises = details.exercises || [];
+          const totalDuration = exercises.reduce((sum, e) => sum + (Number(e.duration) || 0), 0);
+          const totalCalories = exercises.reduce((sum, e) => sum + (Number(e.calories) || 0), 0);
+          return {
+            date: r.date,
+            exerciseDuration: totalDuration,
+            exerciseCalories: totalCalories,
+            exerciseCount: exercises.length,
+          };
+        });
         this.setData({ historyRecords: history });
         return;
       }
@@ -88,11 +189,14 @@ Page({
       date.setDate(date.getDate() - i);
       const dateStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
       const record = wx.getStorageSync(`record_${dateStr}`) || {};
+      const migrated = this.migrateOldRecord(record);
+      const totalDuration = migrated.exercises.reduce((sum, e) => sum + (Number(e.duration) || 0), 0);
+      const totalCalories = migrated.exercises.reduce((sum, e) => sum + (Number(e.calories) || 0), 0);
       history.push({
         date: dateStr,
-        weight: record.weight || '',
-        calories: record.calories || '',
-        exercise: record.exercise || '',
+        exerciseDuration: totalDuration,
+        exerciseCalories: totalCalories,
+        exerciseCount: migrated.exercises.length,
       });
     }
     this.setData({ historyRecords: history });
@@ -100,115 +204,143 @@ Page({
 
   // 切换标签页
   onTabChange(e) {
+    this.setData({ currentTab: e.detail.value });
+  },
+
+  // ========== 运动记录弹窗 ==========
+  openExerciseModal() {
     this.setData({
-      currentTab: e.detail.value,
+      showExerciseModal: true,
+      selectedExerciseType: '',
+      exerciseDuration: '',
+      exerciseCaloriesPreview: 0,
     });
   },
 
-  // 输入体重
-  onWeightInput(e) {
-    this.setData({
-      'records.weight': e.detail.value,
-    });
-    this.saveRecord();
+  closeExerciseModal() {
+    this.setData({ showExerciseModal: false });
   },
 
-  // 输入卡路里
-  onCaloriesInput(e) {
+  // 选择运动类型
+  onSelectExerciseType(e) {
+    const type = e.currentTarget.dataset.type;
+    const { exerciseDuration, userWeight } = this.data;
+    const preview = exerciseDuration
+      ? calculateCalories(type, Number(exerciseDuration) || 0, userWeight)
+      : 0;
     this.setData({
-      'records.calories': e.detail.value,
+      selectedExerciseType: type,
+      exerciseCaloriesPreview: preview,
     });
-    this.saveRecord();
-  },
-
-  // 输入睡眠时长
-  onSleepInput(e) {
-    this.setData({
-      'records.sleep': e.detail.value,
-    });
-    this.saveRecord();
   },
 
   // 输入运动时长
-  onExerciseInput(e) {
+  onExerciseDurationInput(e) {
+    const duration = e.detail.value;
+    const { selectedExerciseType, userWeight } = this.data;
+    const preview = selectedExerciseType && duration
+      ? calculateCalories(selectedExerciseType, Number(duration) || 0, userWeight)
+      : 0;
     this.setData({
-      'records.exercise': e.detail.value,
+      exerciseDuration: duration,
+      exerciseCaloriesPreview: preview,
     });
-    this.saveRecord();
   },
 
-  // 输入运动消耗卡路里
-  onExerciseCaloriesInput(e) {
-    this.setData({
-      'records.exerciseCalories': e.detail.value,
-    });
-    this.saveRecord();
-  },
+  // 确认添加运动
+  confirmAddExercise() {
+    const { selectedExerciseType, exerciseDuration, exerciseCaloriesPreview, userWeight } = this.data;
+    if (!selectedExerciseType) {
+      wx.showToast({ title: '请选择运动类型', icon: 'none' });
+      return;
+    }
+    if (!exerciseDuration || Number(exerciseDuration) <= 0) {
+      wx.showToast({ title: '请输入有效时长', icon: 'none' });
+      return;
+    }
 
-  // 切换生理期
-  onPeriodChange(e) {
-    this.setData({
-      'records.period': e.detail.value,
-    });
-    this.saveRecord();
-  },
-
-  // 保存记录
-  saveRecord() {
-    const { currentDate, records } = this.data;
-    
-    const recordData = {
-      weight: records.weight || '',
-      calories: records.calories || '',
-      sleep: records.sleep || '',
-      period: records.period || false,
-      exercise: records.exercise || '',
-      exerciseCalories: records.exerciseCalories || '',
+    const calories = exerciseCaloriesPreview || calculateCalories(selectedExerciseType, Number(exerciseDuration), userWeight);
+    const exerciseItem = {
+      type: selectedExerciseType,
+      duration: Number(exerciseDuration),
+      calories,
     };
-    
+
+    const exercises = [...this.data.records.exercises, exerciseItem];
+    this.setData({
+      'records.exercises': exercises,
+      showExerciseModal: false,
+    });
+    this.updateExerciseStats(exercises);
+
+    this.saveRecord();
+    wx.showToast({ title: '添加成功', icon: 'success', duration: 1000 });
+  },
+
+  // 删除某条运动记录
+  removeExercise(e) {
+    const index = e.currentTarget.dataset.index;
+    wx.showModal({
+      title: '确认删除',
+      content: '确定删除这条运动记录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          const exercises = [...this.data.records.exercises];
+          exercises.splice(index, 1);
+          this.setData({ 'records.exercises': exercises });
+          this.updateExerciseStats(exercises);
+          this.saveRecord();
+        }
+      },
+    });
+  },
+
+  // 获取运动类型信息
+  getExerciseTypeInfo(type) {
+    return EXERCISE_TYPES.find(t => t.key === type) || { label: '其他', icon: '🏃', color: '#999' };
+  },
+
+  // ========== 保存记录 ==========
+  saveRecord() {
+    const { currentDate, records, userWeight } = this.data;
+
+    // 计算运动总时长和总消耗
+    const totalDuration = records.exercises.reduce((sum, e) => sum + (Number(e.duration) || 0), 0);
+    const totalCalories = records.exercises.reduce((sum, e) => sum + (Number(e.calories) || 0), 0);
+
+    const recordData = { exercises: records.exercises };
     wx.setStorageSync(`record_${currentDate}`, recordData);
-    
+
     // 异步同步到后端
     try {
+      // 确定主运动类型（取时长最长的）
+      let mainType = 'general';
+      if (records.exercises.length > 0) {
+        const mainExercise = records.exercises.reduce((max, e) =>
+          (e.duration > max.duration ? e : max), records.exercises[0]);
+        mainType = mainExercise.type;
+      }
+
       request('/api/user/exercise', 'POST', {
         date: currentDate,
-        type: 'general',
-        duration: Number(records.exercise) || 0,
-        calories: Number(records.exerciseCalories) || 0,
-        details: recordData,
-      }).catch(err => console.warn('运动记录同步后端失败:', err.message));
-      // 同时同步身体数据
-      if (records.weight) {
-        request('/api/user/body-data', 'POST', {
-          date: currentDate,
-          weight: Number(records.weight) || null,
-        }).catch(err => console.warn('身体数据同步后端失败:', err.message));
-      }
+        type: mainType,
+        duration: totalDuration,
+        calories: totalCalories,
+        details: { exercises: records.exercises, weight: userWeight },
+      }).then((res) => {
+        if (res.code !== 200) {
+          console.error('运动记录同步后端失败:', res.message);
+        } else {
+          console.log('运动记录同步后端成功');
+        }
+      }).catch(err => {
+        console.warn('运动记录同步后端失败:', err.message);
+      });
     } catch (e) { /* ignore */ }
-    
-    // 如果记录了生理期，同步到全局记录中
-    if (records.period) {
-      const periodRecords = wx.getStorageSync('period_records') || [];
-      if (periodRecords.indexOf(currentDate) === -1) {
-        periodRecords.push(currentDate);
-        periodRecords.sort();
-        wx.setStorageSync('period_records', periodRecords);
-      }
-    } else {
-      const periodRecords = wx.getStorageSync('period_records') || [];
-      const index = periodRecords.indexOf(currentDate);
-      if (index > -1) {
-        periodRecords.splice(index, 1);
-        wx.setStorageSync('period_records', periodRecords);
-      }
-    }
-    
-    wx.showToast({ title: '已保存', icon: 'success', duration: 1000 });
-    
+
     const app = getApp();
     if (app.eventBus) {
       app.eventBus.emit('record-updated', recordData);
     }
   },
 });
-

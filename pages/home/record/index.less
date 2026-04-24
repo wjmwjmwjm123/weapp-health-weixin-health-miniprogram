@@ -7,11 +7,69 @@
   .record-form {
     padding: 24rpx;
 
+    // 今日运动汇总卡片
+    .summary-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16rpx;
+      padding: 40rpx 32rpx;
+      margin-bottom: 24rpx;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.2);
+
+      .summary-item {
+        text-align: center;
+        flex: 1;
+
+        .summary-num {
+          display: block;
+          font-size: 48rpx;
+          font-weight: 800;
+          color: #fff;
+          line-height: 1.2;
+        }
+
+        .summary-label {
+          font-size: 24rpx;
+          color: rgba(255, 255, 255, 0.8);
+          margin-top: 8rpx;
+        }
+      }
+
+      .summary-divider {
+        width: 2rpx;
+        height: 60rpx;
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+
     .record-section {
       background-color: #fff;
       border-radius: 16rpx;
       padding: 32rpx;
       margin-bottom: 24rpx;
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24rpx;
+        padding-bottom: 16rpx;
+        border-bottom: 1rpx solid #f0f0f0;
+
+        .section-title {
+          font-size: 32rpx;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .section-summary {
+          font-size: 24rpx;
+          color: #667eea;
+          font-weight: 500;
+        }
+      }
 
       .section-title {
         font-size: 32rpx;
@@ -49,6 +107,88 @@
           margin-left: 24rpx;
         }
       }
+
+      // 运动列表
+      .exercise-list {
+        .exercise-item {
+          display: flex;
+          align-items: center;
+          padding: 20rpx 0;
+          border-bottom: 1rpx solid #f5f5f5;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .exercise-icon {
+            width: 72rpx;
+            height: 72rpx;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36rpx;
+            margin-right: 24rpx;
+            flex-shrink: 0;
+          }
+
+          .exercise-info {
+            flex: 1;
+
+            .exercise-name {
+              font-size: 30rpx;
+              font-weight: 600;
+              color: #333;
+              margin-bottom: 6rpx;
+            }
+
+            .exercise-meta {
+              font-size: 24rpx;
+              color: #999;
+            }
+          }
+
+          .exercise-delete {
+            width: 56rpx;
+            height: 56rpx;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+
+            &:active {
+              background: #f5f5f5;
+            }
+          }
+        }
+      }
+
+      .exercise-empty {
+        text-align: center;
+        padding: 40rpx 0;
+        color: #bbb;
+        font-size: 26rpx;
+      }
+
+      .add-exercise-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12rpx;
+        margin-top: 24rpx;
+        padding: 24rpx;
+        border: 2rpx dashed #c5cae9;
+        border-radius: 16rpx;
+        color: #667eea;
+        font-size: 28rpx;
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &:active {
+          background: #f5f7ff;
+          border-color: #667eea;
+        }
+      }
     }
   }
 
@@ -72,8 +212,199 @@
         font-size: 28rpx;
         color: #666;
         line-height: 1.8;
+        margin-bottom: 12rpx;
+      }
+
+      .history-exercise {
+        .exercise-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8rpx;
+          background: #f0f3ff;
+          padding: 10rpx 20rpx;
+          border-radius: 24rpx;
+          font-size: 24rpx;
+          color: #667eea;
+        }
+      }
+
+      .history-exercise-empty {
+        font-size: 24rpx;
+        color: #ccc;
       }
     }
   }
 }
 
+// 添加运动弹窗
+.exercise-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 999;
+
+  .exercise-modal-content {
+    width: 100%;
+    background: #fff;
+    border-radius: 32rpx 32rpx 0 0;
+    padding: 40rpx 32rpx calc(env(safe-area-inset-bottom) + 32rpx);
+    max-height: 85vh;
+    overflow-y: auto;
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32rpx;
+
+      .modal-title {
+        font-size: 34rpx;
+        font-weight: 700;
+        color: #1a1a1a;
+      }
+
+      .modal-close {
+        width: 56rpx;
+        height: 56rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32rpx;
+        color: #999;
+        border-radius: 50%;
+
+        &:active {
+          background: #f5f5f5;
+        }
+      }
+    }
+
+    .modal-section {
+      margin-bottom: 32rpx;
+
+      .modal-label {
+        font-size: 28rpx;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20rpx;
+      }
+
+      .type-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20rpx;
+
+        .type-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 24rpx 0;
+          border-radius: 16rpx;
+          background: #f7f8fa;
+          border: 2rpx solid transparent;
+          transition: all 0.2s;
+
+          &.active {
+            background: #f0f3ff;
+            border-color: #667eea;
+
+            .type-label {
+              color: #667eea;
+              font-weight: 600;
+            }
+          }
+
+          &:active {
+            transform: scale(0.96);
+          }
+
+          .type-icon {
+            font-size: 48rpx;
+            margin-bottom: 8rpx;
+          }
+
+          .type-label {
+            font-size: 24rpx;
+            color: #666;
+          }
+        }
+      }
+
+      .modal-input {
+        width: 100%;
+        height: 88rpx;
+        background: #f7f8fa;
+        border-radius: 16rpx;
+        padding: 0 24rpx;
+        font-size: 30rpx;
+        color: #333;
+        box-sizing: border-box;
+      }
+    }
+
+    .calories-preview {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8rpx;
+      padding: 32rpx;
+      background: linear-gradient(135deg, #f0f3ff 0%, #e8eaf6 100%);
+      border-radius: 16rpx;
+      margin-bottom: 32rpx;
+
+      .preview-label {
+        font-size: 26rpx;
+        color: #666;
+      }
+
+      .preview-value {
+        font-size: 48rpx;
+        font-weight: 800;
+        color: #667eea;
+      }
+
+      .preview-unit {
+        font-size: 24rpx;
+        color: #999;
+      }
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 24rpx;
+
+      .modal-btn {
+        flex: 1;
+        height: 88rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16rpx;
+        font-size: 30rpx;
+        font-weight: 600;
+
+        &.cancel {
+          background: #f5f5f5;
+          color: #666;
+        }
+
+        &.confirm {
+          background: #667eea;
+          color: #fff;
+          box-shadow: 0 8rpx 20rpx rgba(102, 126, 234, 0.3);
+        }
+
+        &:active {
+          opacity: 0.9;
+          transform: scale(0.98);
+        }
+      }
+    }
+  }
+}

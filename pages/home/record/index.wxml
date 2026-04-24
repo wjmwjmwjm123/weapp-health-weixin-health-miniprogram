@@ -1,97 +1,128 @@
 <view class="record-container">
   <t-tabs value="{{currentTab}}" bind:change="onTabChange">
-    <t-tab-panel label="今日记录" value="0">
+    <t-tab-panel label="今日运动" value="0">
       <view class="record-form">
-        <view class="record-section">
-          <view class="section-title">身体数据</view>
-          
-          <view class="form-item">
-            <view class="form-label">体重 (kg)</view>
-            <input
-              class="form-input"
-              type="digit"
-              placeholder="请输入体重"
-              value="{{records.weight}}"
-              bindinput="onWeightInput"
-            />
+        <!-- 今日运动汇总 -->
+        <view class="summary-card" wx:if="{{records.exercises.length > 0}}">
+          <view class="summary-item">
+            <text class="summary-num">{{records.exercises.length}}</text>
+            <text class="summary-label">运动项</text>
           </view>
-
-          <view class="form-item">
-            <view class="form-label">睡眠时长 (小时)</view>
-            <input
-              class="form-input"
-              type="digit"
-              placeholder="请输入睡眠时长"
-              value="{{records.sleep}}"
-              bindinput="onSleepInput"
-            />
+          <view class="summary-divider"></view>
+          <view class="summary-item">
+            <text class="summary-num">{{totalExerciseCalories}}</text>
+            <text class="summary-label">千卡消耗</text>
           </view>
-
-          <view class="form-item">
-            <view class="form-label">生理期</view>
-            <t-switch value="{{records.period}}" bind:change="onPeriodChange" />
+          <view class="summary-divider"></view>
+          <view class="summary-item">
+            <text class="summary-num">{{totalExerciseDuration}}</text>
+            <text class="summary-label">分钟</text>
           </view>
         </view>
 
+        <!-- 运动记录 -->
         <view class="record-section">
-          <view class="section-title">饮食记录</view>
-          
-          <view class="form-item">
-            <view class="form-label">摄入卡路里 (卡)</view>
-            <input
-              class="form-input"
-              type="digit"
-              placeholder="请输入摄入的卡路里"
-              value="{{records.calories}}"
-              bindinput="onCaloriesInput"
-            />
-          </view>
-        </view>
-
-        <view class="record-section">
-          <view class="section-title">运动记录</view>
-          
-          <view class="form-item">
-            <view class="form-label">运动时长 (分钟)</view>
-            <input
-              class="form-input"
-              type="digit"
-              placeholder="请输入运动时长"
-              value="{{records.exercise}}"
-              bindinput="onExerciseInput"
-            />
+          <view class="section-header">
+            <view class="section-title">运动清单</view>
           </view>
 
-          <view class="form-item">
-            <view class="form-label">消耗卡路里 (卡)</view>
-            <input
-              class="form-input"
-              type="digit"
-              placeholder="请输入消耗的卡路里"
-              value="{{records.exerciseCalories}}"
-              bindinput="onExerciseCaloriesInput"
-            />
+          <!-- 运动列表 -->
+          <view class="exercise-list" wx:if="{{records.exercises.length > 0}}">
+            <view class="exercise-item" wx:for="{{records.exercises}}" wx:key="index">
+              <view class="exercise-icon" style="background: {{getExerciseTypeInfo(item.type).color}}20; color: {{getExerciseTypeInfo(item.type).color}}">
+                {{getExerciseTypeInfo(item.type).icon}}
+              </view>
+              <view class="exercise-info">
+                <view class="exercise-name">{{getExerciseTypeInfo(item.type).label}}</view>
+                <view class="exercise-meta">{{item.duration}} 分钟 · 消耗 {{item.calories}} 千卡</view>
+              </view>
+              <view class="exercise-delete" catchtap="removeExercise" data-index="{{index}}">
+                <t-icon name="close" size="32rpx" color="#ccc" />
+              </view>
+            </view>
+          </view>
+
+          <!-- 空状态 -->
+          <view class="exercise-empty" wx:else>
+            <text>今日还没有记录运动，快去添加吧</text>
+          </view>
+
+          <!-- 添加按钮 -->
+          <view class="add-exercise-btn" bindtap="openExerciseModal">
+            <t-icon name="add" size="36rpx" color="#667eea" />
+            <text>添加运动</text>
           </view>
         </view>
       </view>
     </t-tab-panel>
 
+    <!-- 历史记录 -->
     <t-tab-panel label="历史记录" value="1">
       <view class="history-list">
-        <view
-          wx:for="{{historyRecords}}"
-          wx:key="date"
-          class="history-item"
-        >
+        <view wx:for="{{historyRecords}}" wx:key="date" class="history-item">
           <view class="history-date">{{item.date}}</view>
-          <view class="history-data">
-            <text wx:if="{{item.weight}}">体重: {{item.weight}}kg</text>
-            <text wx:if="{{item.calories}}"> | 摄入: {{item.calories}}卡</text>
-            <text wx:if="{{item.exercise}}"> | 运动: {{item.exercise}}分钟</text>
+          <view class="history-exercise" wx:if="{{item.exerciseCount > 0}}">
+            <view class="exercise-badge">
+              <t-icon name="sport" size="24rpx" color="#667eea" />
+              <text>{{item.exerciseCount}} 项运动 · {{item.exerciseDuration}}分钟 · {{item.exerciseCalories}}千卡</text>
+            </view>
+          </view>
+          <view class="history-exercise-empty" wx:else>
+            <text>无运动记录</text>
           </view>
         </view>
       </view>
     </t-tab-panel>
   </t-tabs>
-</view>
 
+  <!-- 添加运动弹窗 -->
+  <view class="exercise-modal" wx:if="{{showExerciseModal}}" catchtap="closeExerciseModal">
+    <view class="exercise-modal-content" catchtap="preventBubble">
+      <view class="modal-header">
+        <view class="modal-title">添加运动</view>
+        <view class="modal-close" catchtap="closeExerciseModal">✕</view>
+      </view>
+
+      <!-- 运动类型选择 -->
+      <view class="modal-section">
+        <view class="modal-label">选择运动类型</view>
+        <view class="type-grid">
+          <view
+            wx:for="{{exerciseTypes}}"
+            wx:key="key"
+            class="type-item {{selectedExerciseType === item.key ? 'active' : ''}}"
+            catchtap="onSelectExerciseType"
+            data-type="{{item.key}}"
+          >
+            <text class="type-icon">{{item.icon}}</text>
+            <text class="type-label">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 时长输入 -->
+      <view class="modal-section">
+        <view class="modal-label">运动时长（分钟）</view>
+        <input
+          class="modal-input"
+          type="number"
+          placeholder="例如：30"
+          value="{{exerciseDuration}}"
+          bindinput="onExerciseDurationInput"
+        />
+      </view>
+
+      <!-- 卡路里预览 -->
+      <view class="calories-preview" wx:if="{{exerciseCaloriesPreview > 0}}">
+        <text class="preview-label">预计消耗</text>
+        <text class="preview-value">{{exerciseCaloriesPreview}}</text>
+        <text class="preview-unit">千卡</text>
+      </view>
+
+      <view class="modal-footer">
+        <view class="modal-btn cancel" catchtap="closeExerciseModal">取消</view>
+        <view class="modal-btn confirm" catchtap="confirmAddExercise">确认添加</view>
+      </view>
+    </view>
+  </view>
+</view>

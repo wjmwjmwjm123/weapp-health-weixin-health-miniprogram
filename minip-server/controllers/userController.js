@@ -246,28 +246,85 @@ async function getExerciseRecords(req, res) {
   }
 }
 
+// 运动类型 MET 值表（代谢当量）
+const MET_VALUES = {
+  walk: 3.5,        // 步行
+  run: 8.0,         // 跑步
+  ride: 6.0,        // 骑行
+  swim: 6.0,        // 游泳
+  rope: 10.0,       // 跳绳
+  yoga: 2.5,        // 瑜伽
+  fitness: 5.0,     // 健身/力量训练
+  basketball: 6.5,  // 篮球
+  badminton: 5.5,   // 羽毛球
+};
+
+// 根据运动类型、时长、体重计算消耗卡路里
+function calculateCalories(type, durationMinutes, weightKg = 60) {
+  const met = MET_VALUES[type] || 5.0;
+  return Math.round(met * weightKg * (durationMinutes / 60));
+}
+
 // 保存运动记录
 async function saveExerciseRecord(req, res) {
   try {
     const { date, type, duration, calories, steps, details } = req.body;
+    console.log('[saveExerciseRecord] 收到请求:', { date, type, duration, calories, steps, userId: req.user.id });
+
     if (!date) {
       return res.status(400).json({ code: 400, message: '缺少日期', data: null });
     }
 
-    const upsertData = {
-      user_id: req.user.id,
-      date,
-      type: type || 'general',
-      duration: duration || 0,
-      calories: calories || 0,
-      steps: steps || 0,
-      details: details || {},
-    };
+    let finalCalories = calories || 0;
+    const finalType = type || 'general';
+    const finalDuration = duration || 0;
 
-    const [record, created] = await db.ExerciseRecord.upsert(upsertData);
+    // 如果未传入卡路里，且传入了运动类型和时长，则自动计算
+    if (!finalCalories && finalDuration && MET_VALUES[finalType]) {
+      // 尝试从用户身体数据获取体重，否则默认 60kg
+      const bodyData = await db.BodyData.findOne({
+        where: { user_id: req.user.id },
+        order: [['date', 'DESC']],
+      });
+      const weight = bodyData?.weight || details?.weight || 60;
+      finalCalories = calculateCalories(finalType, finalDuration, weight);
+    }
 
-    res.json({ code: 200, message: created ? '创建成功' : '更新成功', data: record });
+    // 查询同一天是否已有记录（避免 upsert 覆盖其他字段）
+    const existing = await db.ExerciseRecord.findOne({
+      where: { user_id: req.user.id, date },
+    });
+
+    let record;
+    if (existing) {
+      // 合并更新：只更新传入的字段，保留已有字段
+      const updateData = {};
+      if (type !== undefined) updateData.type = finalType;
+      if (duration !== undefined) updateData.duration = finalDuration;
+      if (calories !== undefined) updateData.calories = finalCalories;
+      if (steps !== undefined) updateData.steps = steps;
+      if (details !== undefined) {
+        updateData.details = { ...existing.details, ...details };
+      }
+      await existing.update(updateData);
+      record = await existing.reload();
+      console.log('[saveExerciseRecord] 更新已有记录:', { recordId: record.id, type: record.type });
+      res.json({ code: 200, message: '更新成功', data: record });
+    } else {
+      record = await db.ExerciseRecord.create({
+        user_id: req.user.id,
+        date,
+        type: finalType,
+        duration: finalDuration,
+        calories: finalCalories,
+        steps: steps || 0,
+        details: details || {},
+      });
+      console.log('[saveExerciseRecord] 创建新记录:', { recordId: record.id, type: record.type });
+      res.json({ code: 200, message: '创建成功', data: record });
+    }
   } catch (err) {
+    console.error('[saveExerciseRecord] 保存失败:', err.message);
     res.status(500).json({ code: 500, message: err.message, data: null });
   }
 }

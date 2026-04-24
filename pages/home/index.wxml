@@ -107,20 +107,24 @@
       <!-- 今日概览 -->
       <view class="data-card overview-data" bindtap="onModuleTap" data-url="/pages/home/record/index">
         <view class="card-head">
-          <text class="title">今日摄入</text>
+          <text class="title">今日概览</text>
           <t-icon name="chevron-right" size="32rpx" color="#ccc" />
         </view>
         <view class="card-body">
-      <view class="overview-item">
-            <text class="lbl">饮食</text>
-            <text class="val">{{todayData.caloriesIn}}</text>
+          <view class="overview-item">
+            <text class="lbl">饮食摄入</text>
+            <text class="val">{{todayData.caloriesIn}} 卡</text>
+          </view>
+          <view class="overview-item">
+            <text class="lbl">运动消耗</text>
+            <text class="val">{{todayData.caloriesOut}} 千卡</text>
+          </view>
+          <view class="overview-item" wx:if="{{todayData.exerciseTime > 0}}">
+            <text class="lbl">运动时长</text>
+            <text class="val">{{todayData.exerciseTime}} 分钟</text>
+          </view>
+        </view>
       </view>
-      <view class="overview-item">
-            <text class="lbl">运动</text>
-            <text class="val">{{todayData.caloriesOut}}</text>
-      </view>
-      </view>
-    </view>
   </view>
 
   <!-- 今日任务 -->

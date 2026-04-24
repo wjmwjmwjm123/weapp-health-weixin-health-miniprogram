@@ -167,6 +167,13 @@ minip/
   - `loadStepsFromBackend()`：`onShow` 自动拉取今日步数
   - `refreshSteps()`：顶部刷新按钮触发后端同步
   - `setManualSteps()`：手动输入步数后 POST 到后端持久化
+- **2025-04-24 修复同步覆盖问题**：
+  - 问题：`ExerciseRecord` 表有唯一索引 `(user_id, date)`，原 `upsert` 逻辑会全字段覆盖，导致步数和运动记录互相清零
+  - 修复：`saveExerciseRecord` 改为先 `findOne` 查询，已有记录则**合并更新**（只更新传入字段），无记录则 `create`
+  - 效果：同一天可分别设置步数和添加多条运动记录，互不影响
+- **2025-04-24 管理后台增强**：
+  - `exercises.ejs` 表格新增"运动明细"列，展示 `details.exercises` 中的具体运动项
+  - 后端 `saveExerciseRecord` 增加 `console.log` 日志，方便调试追踪
 
 ---
 
@@ -192,6 +199,9 @@ minip/
 | auth.js 变量未定义 | 重构后 4 处 `wxUserInfo` 未改为 `profileInfo` | 全局修正变量名 |
 | 管理后台用户统计不一致 | `getDashboardStats` 未过滤 `role='user'` | `User.count` 增加 `where: { role: 'user' }` |
 | 管理员账号无法登录 | db-sync 初始化时 nickname 为 `管理员` 而非 `admin` | 修正为 `nickname='admin'`，并增加已有账号更新逻辑 |
+| 运动记录保存后管理后台不可见 | `ExerciseRecord` 表唯一索引 `(user_id, date)` 导致 `upsert` 全字段覆盖，步数与运动记录互相清零 | 后端 `saveExerciseRecord` 改为 `findOne → update/create`，只更新传入字段，保留已有数据 |
+| 运动记录弹窗选择类型后自动关闭 | 弹窗父元素 `catchtap` 关闭，子元素使用 `bindtap` 导致事件冒泡 | 弹窗内所有点击事件改为 `catchtap`，内容容器增加 `preventBubble` 空方法 |
+| WXML 编译报错 `unexpected '>'` | WXML `{{}}` 中使用了 `reduce` 箭头函数和内联对象数组字面量 | 将复杂计算移至 JS 的 `data`，WXML 只绑定简单变量 |
 
 ---
 
@@ -356,18 +366,3 @@ http://localhost:3000/admin/login
 6. **Storage 规范**：本地存储键名统一为 `user_points`、`points_history`、`steps_YYYY-MM-DD` 等。
 7. **事件总线**：`utils/eventBus.js` 实现页面间通信（登录成功、积分变化、缓存清除等）。
 8. **Mock 机制**：保留 `mock/` 目录用于离线开发，线上自动切换后端接口。
-
----
-
-## 八、后续可扩展方向
-
-- [ ] 管理员账号管理页面（在后台直接增删改管理员）
-- [ ] 订单管理模块
-- [ ] 数据导出（Excel / CSV）
-- [ ] 操作日志审计
-- [ ] 小程序端消息推送（订阅消息）
-- [ ] 高德地图完整集成（定位、导航）
-
----
-
-> 本文档由项目现有 `README.md`、`DEPLOY_GUIDE.md`、`PROJECT_SUMMARY.md` 整合而成，覆盖功能清单、Bug 修复、部署流程与运维指南。

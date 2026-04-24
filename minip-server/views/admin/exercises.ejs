@@ -29,10 +29,11 @@
             <th>时长(分钟)</th>
             <th>卡路里</th>
             <th>类型</th>
+            <th>运动明细</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="6" class="loading">加载中...</td></tr>
+          <tr><td colspan="7" class="loading">加载中...</td></tr>
         </tbody>
       </table>
     </div>
@@ -48,7 +49,7 @@
       currentPage = page;
       const keyword = document.getElementById('searchInput').value.trim();
       const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '<tr><td colspan="6" class="loading">加载中...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="loading">加载中...</td></tr>';
 
       try {
         const res = await fetch(`/admin/api/exercises?page=${page}&pageSize=20&keyword=${encodeURIComponent(keyword)}`);
@@ -59,9 +60,14 @@
         totalPages = Math.ceil(total / 20);
 
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="empty">暂无数据</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="empty">暂无数据</td></tr>';
         } else {
-          tbody.innerHTML = list.map(r => `
+          tbody.innerHTML = list.map(r => {
+            const exercises = (r.details && r.details.exercises) || [];
+            const detailStr = exercises.length > 0
+              ? exercises.map(e => `${e.type} ${e.duration}分钟`).join('、')
+              : '-';
+            return `
             <tr>
               <td style="font-weight:600">${r.user ? r.user.nickname : '未知用户'}</td>
               <td style="color:var(--color-text-secondary)">${r.date}</td>
@@ -69,13 +75,14 @@
               <td>${r.duration || 0}</td>
               <td>${r.calories || 0}</td>
               <td><span class="badge" style="background:var(--color-primary-light);color:var(--color-primary-dark)">${r.type || '-'}</span></td>
+              <td style="font-size:12px;color:var(--color-text-secondary)">${detailStr}</td>
             </tr>
-          `).join('');
+          `}).join('');
         }
 
         renderPagination();
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6" class="error">加载失败</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="error">加载失败</td></tr>';
       }
     }
 
