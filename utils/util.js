@@ -35,7 +35,4 @@ const getLocalUrl = (path, name) => {
   }
 };
 
-module.exports = {
-  formatTime,
-  getLocalUrl,
-};
+export { formatTime, getLocalUrl };

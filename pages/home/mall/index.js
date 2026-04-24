@@ -1,4 +1,5 @@
-const cartUtil = require('~/utils/cart');
+import * as cartUtil from '~/utils/cart';
+import request from '~/api/request';
 
 // 本地兜底数据
 const LOCAL_COURSES = [
@@ -74,7 +75,6 @@ Page({
   // 从后端获取商品列表
   async fetchProducts() {
     try {
-      const request = require('~/api/request').default;
       const res = await request('/api/product', 'GET');
       if (res.code === 200 && res.data && res.data.list && res.data.list.length > 0) {
         const courses = [];

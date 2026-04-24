@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - 纤途无忧</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="page-header page-header-flex">
+      <h1>商品管理</h1>
+      <button class="btn btn-primary" onclick="openModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        新增商品
+      </button>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" class="form-input search-input" id="searchInput" placeholder="搜索商品名称...">
+      <button class="btn btn-primary" onclick="renderTable()">搜索</button>
+    </div>
+
+    <div class="data-table">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px">ID</th>
+            <th style="width:70px">图片</th>
+            <th>名称</th>
+            <th>分类</th>
+            <th>价格</th>
+            <th>库存</th>
+            <th>状态</th>
+            <th style="width:120px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="8" class="loading">加载中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">新增商品</h3>
+        <button class="modal-close" onclick="closeModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="productId">
+        <div class="form-group">
+          <label>商品名称</label>
+          <input type="text" id="pName" class="form-input" placeholder="请输入商品名称">
+        </div>
+        <div class="form-group">
+          <label>商品描述</label>
+          <textarea id="pDesc" class="form-textarea" placeholder="请输入商品描述"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>售价</label>
+            <input type="number" id="pPrice" class="form-input" placeholder="0.00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>原价（可选）</label>
+            <input type="number" id="pOriginalPrice" class="form-input" placeholder="0.00" step="0.01">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>库存</label>
+            <input type="number" id="pStock" class="form-input" placeholder="999">
+          </div>
+          <div class="form-group">
+            <label>分类</label>
+            <select id="pType" class="form-select">
+              <option value="course">课程</option>
+              <option value="equipment">设备</option>
+              <option value="tcm">中医商品</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>状态</label>
+            <select id="pStatus" class="form-select">
+              <option value="1">上架</option>
+              <option value="0">下架</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>图片链接</label>
+            <input type="text" id="pImage" class="form-input" placeholder="https://...">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveProduct()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allProducts = [];
+
+    const typeMap = { course: '课程', equipment: '设备', tcm: '中医商品' };
+    const typeClassMap = { course: 'type-course', equipment: 'type-equipment', tcm: 'type-tcm' };
+
+    async function loadProducts() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
+
+      try {
+        const res = await fetch('/admin/api/products');
+        const result = await res.json();
+        if (result.code !== 200) return;
+
+        allProducts = result.data || [];
+        renderTable();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="8" class="error">加载失败</td></tr>';
+      }
+    }
+
+    function renderTable() {
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      const filtered = keyword ? allProducts.filter(p => p.name.toLowerCase().includes(keyword)) : allProducts;
+      const tbody = document.getElementById('tableBody');
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty">暂无数据</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => {
+        const imgHtml = p.image
+          ? `<img src="${p.image}" class="product-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'">`
+            + `<span class="product-thumb-placeholder" style="display:none">无图</span>`
+          : `<span class="product-thumb-placeholder">无图</span>`;
+        const typeLabel = typeMap[p.type] || p.type;
+        const typeCls = typeClassMap[p.type] || '';
+        const statusLabel = p.status == 1 ? '上架' : '下架';
+        const statusCls = p.status == 1 ? 'badge-on' : 'badge-off';
+        return `<tr>
+          <td style="color:var(--color-text-secondary);font-size:13px">${p.id}</td>
+          <td>${imgHtml}</td>
+          <td>
+            <div style="font-weight:600">${p.name}</div>
+            <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">${p.desc || ''}</div>
+          </td>
+          <td><span class="badge ${typeCls}">${typeLabel}</span></td>
+          <td>
+            <span style="font-weight:600;color:var(--color-primary-dark)">¥${p.price}</span>
+            ${p.original_price ? `<span style="text-decoration:line-through;color:var(--color-text-secondary);margin-left:6px;font-size:12px">¥${p.original_price}</span>` : ''}
+          </td>
+          <td>${p.stock}</td>
+          <td><span class="badge ${statusCls}">${statusLabel}</span></td>
+          <td>
+            <div class="action-btns">
+              <button class="btn btn-secondary btn-sm" onclick="editProduct(${p.id})">编辑</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">删除</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function openModal(product = null) {
+      document.getElementById('modal').classList.add('active');
+      document.getElementById('modalTitle').textContent = product ? '编辑商品' : '新增商品';
+      document.getElementById('productId').value = product ? product.id : '';
+      document.getElementById('pName').value = product ? product.name : '';
+      document.getElementById('pDesc').value = product ? product.desc || '' : '';
+      document.getElementById('pPrice').value = product ? product.price : '';
+      document.getElementById('pOriginalPrice').value = product ? product.original_price || '' : '';
+      document.getElementById('pStock').value = product ? product.stock : '';
+      document.getElementById('pType').value = product ? product.type : 'course';
+      document.getElementById('pStatus').value = product ? (product.status == 1 ? '1' : '0') : '1';
+      document.getElementById('pImage').value = product ? product.image || '' : '';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    async function saveProduct() {
+      const id = document.getElementById('productId').value;
+      const payload = {
+        name: document.getElementById('pName').value.trim(),
+        desc: document.getElementById('pDesc').value.trim(),
+        price: parseFloat(document.getElementById('pPrice').value) || 0,
+        original_price: parseFloat(document.getElementById('pOriginalPrice').value) || null,
+        stock: parseInt(document.getElementById('pStock').value) || 0,
+        type: document.getElementById('pType').value,
+        status: parseInt(document.getElementById('pStatus').value),
+        image: document.getElementById('pImage').value.trim(),
+      };
+
+      if (!payload.name) { alert('请输入商品名称'); return; }
+      if (payload.price <= 0) { alert('售价必须大于0'); return; }
+
+      try {
+        const url = id ? `/admin/api/products/${id}` : '/admin/api/products';
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = await res.json();
+        if (result.code === 200) {
+          closeModal();
+          loadProducts();
+        } else {
+          alert(result.message || '保存失败');
+        }
+      } catch (err) {
+        alert('网络错误');
+      }
+    }
+
+    function editProduct(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (product) openModal(product);
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('确定要删除该商品吗？此操作不可恢复。')) return;
+      try {
+        const res = await fetch(`/admin/api/products/${id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (result.code === 200) {
+          loadProducts();
+        } else {
+          alert(result.message || '删除失败');
+        }
+      } catch (err) {
+        alert('网络错误');
+      }
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') renderTable();
+    });
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modal')) closeModal();
+    });
+
+    loadProducts();
+  </script>
+</body>
+</html>

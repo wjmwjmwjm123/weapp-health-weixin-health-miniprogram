@@ -1,6 +1,7 @@
 // 同步数据库表结构
 require('dotenv').config();
 const db = require('../models');
+const bcryptjs = require('bcryptjs');
 
 async function syncDB() {
   try {
@@ -22,6 +23,23 @@ async function syncDB() {
         { name: '荷叶陈皮清脂茶', price: 28.00, desc: '祛湿化浊，午后代谢茶', type: 'tcm' },
       ]);
       console.log('已初始化默认商品数据');
+    }
+
+    // 初始化管理员账号（如果不存在）
+    let adminUser = await db.User.findOne({ where: { role: 'admin' } });
+    if (!adminUser) {
+      const hashedPassword = await bcryptjs.hash('admin123', 10);
+      await db.User.create({
+        openid: `admin_${Date.now()}`,
+        nickname: 'admin',
+        avatar_url: '',
+        role: 'admin',
+        password_hash: hashedPassword,
+      });
+      console.log('已初始化管理员账号：admin / admin123（请在首次登录后立即修改密码）');
+    } else if (adminUser.nickname !== 'admin') {
+      await adminUser.update({ nickname: 'admin' });
+      console.log('已更新管理员账号用户名为：admin');
     }
 
     console.log('初始化完成');

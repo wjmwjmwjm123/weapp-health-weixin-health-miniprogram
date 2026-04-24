@@ -1,3 +1,5 @@
+import request from '~/api/request';
+
 Page({
   data: {
     currentDate: '',
@@ -29,7 +31,6 @@ Page({
 
     // 尝试从后端获取
     try {
-      const request = require('~/api/request').default;
       const res = await request('/api/user/exercise', 'GET', { start: currentDate, end: currentDate });
       if (res.code === 200 && res.data && res.data.length > 0) {
         const backendRecord = res.data[0];
@@ -65,7 +66,6 @@ Page({
 
     // 尝试从后端获取
     try {
-      const request = require('~/api/request').default;
       const res = await request('/api/user/exercise', 'GET', { start: startDate, end: endDate });
       if (res.code === 200 && res.data && res.data.length > 0) {
         const history = res.data.map(r => ({
@@ -170,7 +170,6 @@ Page({
     
     // 异步同步到后端
     try {
-      const request = require('~/api/request').default;
       request('/api/user/exercise', 'POST', {
         date: currentDate,
         type: 'general',

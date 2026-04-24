@@ -2,6 +2,8 @@
  * 用户登录认证工具
  * 支持多种登录方式
  */
+import request from '~/api/request';
+import config from '~/config';
 
 /**
  * 检查用户是否已登录
@@ -68,9 +70,6 @@ export function wechatLogin(profileInfo) {
  * 尝试通过后端登录，失败则回退到本地模式
  */
 function handleWechatLoginWithBackend(code, profileInfo, resolve, reject) {
-  const request = require('~/api/request').default;
-  const config = require('~/config').default;
-
   // 判断是否配置了后端地址（非 localhost）
   const hasBackend = config.baseUrl && !config.baseUrl.includes('localhost');
 

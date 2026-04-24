@@ -77,6 +77,16 @@ module.exports = (sequelize) => {
       allowNull: true,
       comment: '微信session_key',
     },
+    role: {
+      type: DataTypes.ENUM('user', 'admin'),
+      defaultValue: 'user',
+      comment: '用户角色',
+    },
+    password_hash: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      comment: '管理员密码哈希',
+    },
   }, {
     tableName: 'users',
     timestamps: true,

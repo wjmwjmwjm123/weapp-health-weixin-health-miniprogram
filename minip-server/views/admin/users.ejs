@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - 纤途无忧</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="page-header page-header-flex">
+      <h1>用户管理</h1>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" class="form-input search-input" id="searchInput" placeholder="搜索昵称或城市...">
+      <button class="btn btn-primary" onclick="loadUsers(1)">搜索</button>
+    </div>
+
+    <div class="data-table">
+      <table>
+        <thead>
+          <tr>
+            <th>用户</th>
+            <th>积分</th>
+            <th>性别</th>
+            <th>城市</th>
+            <th>注册时间</th>
+            <th style="width:180px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          <tr><td colspan="6" class="loading">加载中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <!-- 编辑用户模态框 -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>编辑用户</h3>
+        <button class="modal-close" onclick="closeEditModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editUserId">
+        <div class="form-group">
+          <label>昵称</label>
+          <input type="text" id="editNickname" class="form-input">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>性别</label>
+            <select id="editGender" class="form-select">
+              <option value="0">未知</option>
+              <option value="1">男</option>
+              <option value="2">女</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>城市</label>
+            <input type="text" id="editCity" class="form-input">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>省份</label>
+            <input type="text" id="editProvince" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>积分余额</label>
+            <input type="number" id="editPoints" class="form-input" disabled style="background:var(--color-primary-light);color:var(--color-text-secondary)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>个人简介</label>
+          <textarea id="editBrief" class="form-textarea" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveUser()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 调整积分模态框 -->
+  <div class="modal-overlay" id="pointsModal">
+    <div class="modal" style="width:420px">
+      <div class="modal-header">
+        <h3>调整积分</h3>
+        <button class="modal-close" onclick="closePointsModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="pointsUserId">
+        <div style="background:var(--color-primary-light);padding:14px 16px;border-radius:var(--radius-sm);margin-bottom:20px;display:flex;align-items:center;gap:10px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span style="font-size:13px;color:var(--color-text-secondary)">当前积分：<strong id="currentPoints" style="color:var(--color-text)">0</strong></span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>操作类型</label>
+            <select id="pointsType" class="form-select">
+              <option value="earn">增加积分</option>
+              <option value="deduct">扣除积分</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>积分数量</label>
+            <input type="number" id="pointsAmount" class="form-input" placeholder="请输入数量" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>备注说明</label>
+          <input type="text" id="pointsDesc" class="form-input" placeholder="可选，如：活动奖励、违规扣减等">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePointsModal()">取消</button>
+        <button class="btn btn-primary" onclick="savePoints()">确认调整</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    let totalPages = 1;
+    let allUsers = [];
+
+    async function loadUsers(page = 1) {
+      currentPage = page;
+      const keyword = document.getElementById('searchInput').value.trim();
+      const tbody = document.getElementById('userTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="loading">加载中...</td></tr>';
+
+      try {
+        const res = await fetch(`/admin/api/users?page=${page}&pageSize=20&keyword=${encodeURIComponent(keyword)}`);
+        const result = await res.json();
+        if (result.code !== 200) return;
+
+        const { total, list } = result.data;
+        totalPages = Math.ceil(total / 20);
+        allUsers = list;
+
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty">暂无数据</td></tr>';
+        } else {
+          tbody.innerHTML = list.map(u => {
+            const genderText = ['未知', '男', '女'][u.gender] || '未知';
+            const avatarHtml = u.avatar_url
+              ? `<img src="${u.avatar_url}" class="avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'">`
+                + `<span class="avatar-placeholder" style="display:none">${u.nickname ? u.nickname[0] : '?'}</span>`
+              : `<span class="avatar-placeholder">${u.nickname ? u.nickname[0] : '?'}</span>`;
+            return `<tr>
+              <td style="display:flex;align-items:center;gap:10px;">${avatarHtml}<span style="font-weight:600">${u.nickname || '未命名'}</span></td>
+              <td style="font-weight:600;color:var(--color-primary-dark)">${u.points || 0}</td>
+              <td>${genderText}</td>
+              <td>${u.city || '-'}</td>
+              <td style="color:var(--color-text-secondary)">${new Date(u.created_at).toLocaleDateString()}</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-secondary btn-sm" onclick="editUser(${u.id})">编辑</button>
+                  <button class="btn btn-primary btn-sm" onclick="adjustPoints(${u.id}, ${u.points || 0})">积分</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">删除</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('');
+        }
+
+        renderPagination();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="error">加载失败</td></tr>';
+      }
+    }
+
+    function renderPagination() {
+      const container = document.getElementById('pagination');
+      let html = '';
+      html += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="loadUsers(${currentPage - 1})">上一页</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          html += `<button class="${i === currentPage ? 'active' : ''}" onclick="loadUsers(${i})">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          html += `<span style="padding:6px 8px;color:var(--color-text-secondary)">...</span>`;
+        }
+      }
+      html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="loadUsers(${currentPage + 1})">下一页</button>`;
+      container.innerHTML = html;
+    }
+
+    // ========== 编辑用户 ==========
+    function editUser(id) {
+      const user = allUsers.find(u => u.id === id);
+      if (!user) return;
+      document.getElementById('editUserId').value = user.id;
+      document.getElementById('editNickname').value = user.nickname || '';
+      document.getElementById('editGender').value = user.gender || 0;
+      document.getElementById('editCity').value = user.city || '';
+      document.getElementById('editProvince').value = user.province || '';
+      document.getElementById('editPoints').value = user.points || 0;
+      document.getElementById('editBrief').value = user.brief || '';
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('active');
+    }
+
+    async function saveUser() {
+      const id = document.getElementById('editUserId').value;
+      const payload = {
+        nickname: document.getElementById('editNickname').value.trim(),
+        gender: parseInt(document.getElementById('editGender').value),
+        city: document.getElementById('editCity').value.trim(),
+        province: document.getElementById('editProvince').value.trim(),
+        brief: document.getElementById('editBrief').value.trim(),
+      };
+
+      try {
+        const res = await fetch(`/admin/api/users/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = await res.json();
+        if (result.code === 200) {
+          closeEditModal();
+          loadUsers(currentPage);
+        } else {
+          alert(result.message || '保存失败');
+        }
+      } catch (err) {
+        alert('网络错误');
+      }
+    }
+
+    // ========== 调整积分 ==========
+    function adjustPoints(id, points) {
+      document.getElementById('pointsUserId').value = id;
+      document.getElementById('currentPoints').textContent = points;
+      document.getElementById('pointsAmount').value = '';
+      document.getElementById('pointsDesc').value = '';
+      document.getElementById('pointsType').value = 'earn';
+      document.getElementById('pointsModal').classList.add('active');
+    }
+
+    function closePointsModal() {
+      document.getElementById('pointsModal').classList.remove('active');
+    }
+
+    async function savePoints() {
+      const id = document.getElementById('pointsUserId').value;
+      const amount = parseInt(document.getElementById('pointsAmount').value);
+      const type = document.getElementById('pointsType').value;
+      const desc = document.getElementById('pointsDesc').value.trim();
+
+      if (!amount || amount <= 0) {
+        alert('请输入有效的积分数量');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/admin/api/users/${id}/points`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, type, desc }),
+        });
+        const result = await res.json();
+        if (result.code === 200) {
+          closePointsModal();
+          loadUsers(currentPage);
+        } else {
+          alert(result.message || '调整失败');
+        }
+      } catch (err) {
+        alert('网络错误');
+      }
+    }
+
+    // ========== 删除用户 ==========
+    async function deleteUser(id) {
+      if (!confirm('确定要删除该用户吗？此操作将同时删除该用户的所有关联数据（积分记录、运动数据、购物车等），且不可恢复。')) return;
+      try {
+        const res = await fetch(`/admin/api/users/${id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (result.code === 200) {
+          loadUsers(currentPage);
+        } else {
+          alert(result.message || '删除失败');
+        }
+      } catch (err) {
+        alert('网络错误');
+      }
+    }
+
+    // 点击遮罩关闭
+    document.getElementById('editModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('editModal')) closeEditModal();
+    });
+    document.getElementById('pointsModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('pointsModal')) closePointsModal();
+    });
+
+    document.getElementById('searchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loadUsers(1);
+    });
+
+    loadUsers(1);
+  </script>
+</body>
+</html>

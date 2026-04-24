@@ -2,6 +2,8 @@
  * 购物车工具类
  * 后端优先 + 本地回退
  */
+import request from '~/api/request';
+
 const CART_STORAGE_KEY = 'shopping_cart';
 
 function getLocalCart() {
@@ -29,7 +31,6 @@ function saveLocalCart(cart) {
  */
 async function tryBackend(method, path, data) {
   try {
-    const request = require('~/api/request').default;
     const res = await request(path, method, data);
     return res;
   } catch (err) {
@@ -165,14 +166,14 @@ function getCartItems() {
   return getLocalCart();
 }
 
-module.exports = {
+export {
   getCart,
-  saveCart: saveLocalCart,
+  saveLocalCart as saveCart,
   addToCart,
   removeFromCart,
   updateQuantity,
   clearCart,
   getCartItemCount,
   getCartTotalPrice,
-  getCartItems
+  getCartItems,
 };

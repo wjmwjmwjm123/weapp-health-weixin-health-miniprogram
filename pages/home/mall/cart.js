@@ -1,4 +1,4 @@
-const cartUtil = require('~/utils/cart');
+import * as cartUtil from '~/utils/cart';
 
 Page({
   data: {

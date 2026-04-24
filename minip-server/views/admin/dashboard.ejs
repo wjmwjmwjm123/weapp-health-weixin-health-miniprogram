@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - 纤途无忧</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <style>
+    .charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1>数据看板</h1>
+      <p>实时监控小程序核心运营数据</p>
+    </div>
+
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+            <path d="M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <div class="stat-label">用户总数</div>
+        <div class="stat-value" id="totalUsers">-</div>
+        <div class="stat-desc">累计注册用户</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </div>
+        <div class="stat-label">今日新增</div>
+        <div class="stat-value" id="todayUsers">-</div>
+        <div class="stat-desc">较昨日</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div class="stat-label">积分总池</div>
+        <div class="stat-value" id="totalPoints">-</div>
+        <div class="stat-desc">全站用户持有</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+          </svg>
+        </div>
+        <div class="stat-label">公益捐赠</div>
+        <div class="stat-value" id="totalDonated">-</div>
+        <div class="stat-desc">累计捐赠积分</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">用户增长趋势（最近7天）</div>
+        <div class="chart-container" id="growthChart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">积分类型分布</div>
+        <div class="chart-container" id="pointsChart"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadStats() {
+      try {
+        const res = await fetch('/admin/api/dashboard-stats');
+        const result = await res.json();
+        if (result.code !== 200) return;
+
+        const data = result.data;
+        document.getElementById('totalUsers').textContent = data.totalUsers;
+        document.getElementById('todayUsers').textContent = data.todayUsers;
+        document.getElementById('totalPoints').textContent = data.totalPoints.toLocaleString();
+        document.getElementById('totalDonated').textContent = data.totalDonated.toLocaleString();
+
+        const growthChart = echarts.init(document.getElementById('growthChart'));
+        growthChart.setOption({
+          tooltip: { trigger: 'axis', backgroundColor: 'rgba(255,255,255,0.95)', borderColor: '#ebe5db', textStyle: { color: '#2c2419' } },
+          grid: { left: 48, right: 20, top: 20, bottom: 30 },
+          xAxis: {
+            type: 'category',
+            data: data.userGrowth.map(d => d.date.slice(5)),
+            axisLine: { lineStyle: { color: '#ebe5db' } },
+            axisLabel: { color: '#8c7f6e', fontSize: 12 },
+            axisTick: { show: false },
+          },
+          yAxis: {
+            type: 'value',
+            axisLine: { show: false },
+            splitLine: { lineStyle: { color: '#f0ebe3', type: 'dashed' } },
+            axisLabel: { color: '#8c7f6e', fontSize: 12 },
+          },
+          series: [{
+            data: data.userGrowth.map(d => d.count),
+            type: 'line',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 8,
+            lineStyle: { color: '#c4a882', width: 3 },
+            itemStyle: { color: '#c4a882', borderWidth: 2, borderColor: '#fff' },
+            areaStyle: {
+              color: {
+                type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+                colorStops: [
+                  { offset: 0, color: 'rgba(196,168,130,0.25)' },
+                  { offset: 1, color: 'rgba(196,168,130,0.02)' },
+                ],
+              },
+            },
+          }],
+        });
+
+        const pointsChart = echarts.init(document.getElementById('pointsChart'));
+        const typeMap = { earn: '获得', spend: '消耗', deduct: '扣除' };
+        const colorMap = { earn: '#5a8f5a', spend: '#d4a03a', deduct: '#c45555' };
+        pointsChart.setOption({
+          tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)', backgroundColor: 'rgba(255,255,255,0.95)', borderColor: '#ebe5db', textStyle: { color: '#2c2419' } },
+          series: [{
+            type: 'pie',
+            radius: ['45%', '72%'],
+            avoidLabelOverlap: false,
+            padAngle: 3,
+            itemStyle: { borderRadius: 6, borderColor: '#fff', borderWidth: 2 },
+            label: { show: true, formatter: '{b}\n{d}%', color: '#5a5046', fontSize: 12, fontWeight: 500 },
+            labelLine: { lineStyle: { color: '#ebe5db' } },
+            data: data.pointsStats.map(s => ({
+              name: typeMap[s.type] || s.type,
+              value: parseInt(s.total),
+              itemStyle: { color: colorMap[s.type] || '#c4a882' },
+            })),
+          }],
+        });
+      } catch (err) {
+        console.error('加载数据失败:', err);
+      }
+    }
+
+    loadStats();
+    window.addEventListener('resize', () => {
+      echarts.getInstanceByDom(document.getElementById('growthChart'))?.resize();
+      echarts.getInstanceByDom(document.getElementById('pointsChart'))?.resize();
+    });
+  </script>
+</body>
+</html>

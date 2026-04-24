@@ -2,15 +2,21 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const routes = require('./routes');
 
 const app = express();
+
+// 模板引擎配置
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // 中间件
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [],
   credentials: true,
 }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -25,6 +31,7 @@ app.use((req, res, next) => {
 
 // 路由
 app.use('/api', routes);
+app.use('/admin', require('./routes/admin'));
 
 // 健康检查
 app.get('/health', (req, res) => {

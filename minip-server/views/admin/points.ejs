@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - 纤途无忧</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1>积分流水</h1>
+    </div>
+
+    <div class="toolbar">
+      <select class="form-select" id="typeFilter" style="width:140px">
+        <option value="">全部类型</option>
+        <option value="earn">获得</option>
+        <option value="spend">消耗</option>
+        <option value="deduct">扣除</option>
+      </select>
+      <input type="text" class="form-input search-input" id="searchInput" placeholder="搜索用户昵称...">
+      <button class="btn btn-primary" onclick="loadPoints(1)">筛选</button>
+    </div>
+
+    <div class="data-table">
+      <table>
+        <thead>
+          <tr>
+            <th>用户</th>
+            <th>类型</th>
+            <th>金额</th>
+            <th>描述</th>
+            <th>时间</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="5" class="loading">加载中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    let totalPages = 1;
+
+    async function loadPoints(page = 1) {
+      currentPage = page;
+      const type = document.getElementById('typeFilter').value;
+      const keyword = document.getElementById('searchInput').value.trim();
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '<tr><td colspan="5" class="loading">加载中...</td></tr>';
+
+      try {
+        const res = await fetch(`/admin/api/points?page=${page}&pageSize=20&type=${type}&keyword=${encodeURIComponent(keyword)}`);
+        const result = await res.json();
+        if (result.code !== 200) return;
+
+        const { total, list } = result.data;
+        totalPages = Math.ceil(total / 20);
+
+        const typeMap = { earn: '获得', spend: '消耗', deduct: '扣除' };
+        const badgeMap = { earn: 'badge-earn', spend: 'badge-spend', deduct: 'badge-deduct' };
+
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="empty">暂无数据</td></tr>';
+        } else {
+          tbody.innerHTML = list.map(r => `
+            <tr>
+              <td style="font-weight:600">${r.user ? r.user.nickname : '未知用户'}</td>
+              <td><span class="badge ${badgeMap[r.type] || ''}">${typeMap[r.type] || r.type}</span></td>
+              <td style="font-weight:600">${r.amount}</td>
+              <td style="color:var(--color-text-secondary)">${r.desc || '-'}</td>
+              <td style="color:var(--color-text-secondary);font-size:13px">${new Date(r.created_at).toLocaleString()}</td>
+            </tr>
+          `).join('');
+        }
+
+        renderPagination();
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="error">加载失败</td></tr>';
+      }
+    }
+
+    function renderPagination() {
+      const container = document.getElementById('pagination');
+      let html = '';
+      html += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="loadPoints(${currentPage - 1})">上一页</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          html += `<button class="${i === currentPage ? 'active' : ''}" onclick="loadPoints(${i})">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          html += `<span style="padding:6px 8px;color:var(--color-text-secondary)">...</span>`;
+        }
+      }
+      html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="loadPoints(${currentPage + 1})">下一页</button>`;
+      container.innerHTML = html;
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loadPoints(1);
+    });
+
+    loadPoints(1);
+  </script>
+</body>
+</html>
