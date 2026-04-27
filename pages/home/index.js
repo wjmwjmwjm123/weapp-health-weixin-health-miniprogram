@@ -101,6 +101,7 @@ Page({
       targetSteps: 8000, // 目标步数（默认8000）
       targetCalories: 0, // 目标卡路里
       predictedCalories: 0, // 预测消耗卡路里
+      stepsProgress: 0, // 步数完成百分比
       weeklySteps: [], // 一周步数数据（用于热力图）
     },
     modules: [

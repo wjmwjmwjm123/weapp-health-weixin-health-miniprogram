@@ -567,7 +567,7 @@ Page({
   },
 
   onCancelSelect() {
-    wx.navigateBack();
+    wx.switchTab({ url: '/pages/my/index' });
   },
 
   onConfirmSelect() {
@@ -575,6 +575,6 @@ Page({
     if (app.eventBus) {
       app.eventBus.emit('badges-selected', this.data.selectedBadgeIds);
     }
-    wx.navigateBack();
+    wx.switchTab({ url: '/pages/my/index' });
   },
 });

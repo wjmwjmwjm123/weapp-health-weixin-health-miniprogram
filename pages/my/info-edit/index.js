@@ -235,7 +235,7 @@ Page({
         wx.setStorageSync('user_info', updatedUserInfo);
 
         wx.showToast({ title: '保存成功', icon: 'success', duration: 1500 });
-        setTimeout(() => { wx.navigateBack(); }, 1500);
+        setTimeout(() => { wx.switchTab({ url: '/pages/my/index' }); }, 1500);
       } else {
         wx.showToast({ title: res.message || '保存失败', icon: 'none' });
       }
@@ -258,7 +258,7 @@ Page({
       };
       wx.setStorageSync('user_info', updatedUserInfo);
       wx.showToast({ title: '已保存到本地', icon: 'success', duration: 1500 });
-      setTimeout(() => { wx.navigateBack(); }, 1500);
+      setTimeout(() => { wx.switchTab({ url: '/pages/my/index' }); }, 1500);
     }
   },
 });
