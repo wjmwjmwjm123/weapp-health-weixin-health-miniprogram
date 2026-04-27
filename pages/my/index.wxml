@@ -167,7 +167,7 @@
     </view>
   </view>
 
-  <view class="module-card">
+  <view class="module-card account-card">
     <view class="account-actions">
       <view class="account-item" data-type="setting" bindtap="onGoSetting">
         <view class="account-title">系统设置</view>
