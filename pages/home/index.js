@@ -542,6 +542,10 @@ Page({
             const lastStartDate = new Date(lastPeriodStart);
             const nextStartDate = new Date(lastStartDate);
             nextStartDate.setDate(nextStartDate.getDate() + cycleDays);
+            // 如果预测日期已过，则继续加周期直到落在将来
+            while (nextStartDate < todayObj) {
+              nextStartDate.setDate(nextStartDate.getDate() + cycleDays);
+            }
             nextPeriodStart = formatDateStr(nextStartDate);
             
             // 计算预测范围（最早-最晚，基于标准差）

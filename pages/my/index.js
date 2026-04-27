@@ -11,14 +11,6 @@ Page({
     isLoad: false,
     avatarError: false,
     personalInfo: {},
-    mbtiProfile: {
-      type: 'INFP',
-      persona: '纤柔治愈型教练',
-      tip: '保持温柔节奏，连结身心并重塑体态。',
-      story: '根据你的 MBTI 气质，系统将为你生成专属卡通人物、运动口号与饮食偏好，记录每一次蜕变。',
-      emoji: '🧘‍♀️',
-    },
-    avatarThemes: ['元气晨练', '办公室拉伸', '室外慢跑', '中医养生'],
     pointsPlaybook: {
       total: 328,
       charity: 128,
@@ -59,11 +51,6 @@ Page({
         action: '预约直播',
       },
     },
-    rechargeOptions: [
-      { title: '课程能量包', desc: '包含 7 天会员 + 课程抵扣券', price: 29, tag: '热门' },
-      { title: '食谱月卡', desc: '每日推送三餐搭配，支持打印', price: 49, tag: '新' },
-      { title: '装备补给礼盒', desc: '跳绳+弹力带+泡沫轴组合', price: 129, tag: '' },
-    ],
     displayedBadges: [], // 展示的成就徽章（最多6个）
     allBadges: [], // 所有成就数据
   },
@@ -183,14 +170,6 @@ Page({
         this.onShowToast('#t-toast', '功能开发中，敬请期待');
       },
     });
-  },
-
-  onMBTITest() {
-    this.onShowToast('#t-toast', '即将开启 MBTI 测试');
-  },
-
-  onCustomizeAvatar() {
-    this.onShowToast('#t-toast', '已为你创建卡通小人物，稍后可在首页展示');
   },
 
   onDonate() {
@@ -400,15 +379,6 @@ Page({
       confirmText: '太棒了！',
       confirmColor: '#667eea',
     });
-  },
-
-  onRechargeOption(e) {
-    const { title } = e.currentTarget.dataset;
-    this.onShowToast('#t-toast', `${title} 已加入购物袋`);
-  },
-
-  onRechargeCenter() {
-    this.onShowToast('#t-toast', '充值中心即将上线');
   },
 
   onRedeem(e) {

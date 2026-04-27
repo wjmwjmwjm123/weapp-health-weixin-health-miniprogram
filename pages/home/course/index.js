@@ -19,7 +19,7 @@ Page({
         scene: 'home',
         duration: 20,
         calories: 150,
-        videoUrl: '',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         image: '',
         completed: false,
         points: 10, // 完成获得积分

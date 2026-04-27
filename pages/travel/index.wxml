@@ -47,10 +47,7 @@
           <view class="ai-poi" wx:if="{{aiRoute.poiList && aiRoute.poiList.length}}">
             <text class="poi-chip" wx:for="{{aiRoute.poiList}}" wx:key="index">{{item}}</text>
           </view>
-          <view class="card-actions">
-            <view class="btn primary" data-id="{{aiRoute.id}}" bindtap="onStartRoute">体验路线</view>
           </view>
-        </view>
       </view>
 
       <view class="section" wx:if="{{favoriteRoutes.length > 0}}">
@@ -93,9 +90,7 @@
               </view>
             </view>
             <view class="route-desc">{{item.storyline}}</view>
-            <view class="route-actions">
-              <view class="btn ghost" data-id="{{item.id}}" bindtap="onStartRoute">体验路线</view>
-            </view>
+
           </view>
         </block>
       </view>
@@ -141,7 +136,6 @@
             </view>
             <view class="route-desc">{{item.storyline}}</view>
             <view class="route-actions">
-              <view class="btn ghost" data-id="{{item.id}}" bindtap="onStartRoute">体验路线</view>
               <view
                 class="btn primary {{item.saved ? 'disabled' : ''}}"
                 data-id="{{item.id}}"

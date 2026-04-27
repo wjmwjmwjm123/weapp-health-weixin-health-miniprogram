@@ -3,10 +3,10 @@
 
     <!-- Hero 区域 -->
     <view class="hero" bindtap="onHeroTap">
+      <image class="hero-img" src="/static/tcm/hero-bg.jpg" mode="aspectFill" />
       <view class="hero-bg" />
       <view class="hero-content">
-        <text class="hero-label">中医健康</text>
-        <text class="hero-title">{{summary.city}} · {{summary.focus}}</text>
+        <text class="hero-label">中医医生</text>
         <view class="hero-meta">
           <text class="hero-meta-item">积分 {{summary.points}}</text>
           <text class="hero-meta-dot">·</text>
@@ -37,6 +37,7 @@
 
     <!-- 当日药膳 -->
     <view class="recipe-section" wx:if="{{dailyRecipe}}" bindtap="onDailyRecipeTap">
+      <image class="recipe-img" src="/static/tcm/recipe-bg.jpg" mode="aspectFill" />
       <view class="recipe-bg" />
       <view class="recipe-content">
         <view class="recipe-label">当日药膳 · {{dailyRecipe.timing}}</view>

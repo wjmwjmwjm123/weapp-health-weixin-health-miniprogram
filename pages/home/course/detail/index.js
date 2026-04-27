@@ -46,11 +46,23 @@ Page({
     });
   },
 
-  // 播放/暂停
-  onPlayPause() {
-    this.setData({
-      isPlaying: !this.data.isPlaying,
-    });
+  onPlay() {
+    this.setData({ isPlaying: true });
+  },
+
+  onPause() {
+    this.setData({ isPlaying: false });
+  },
+
+  onEnded() {
+    this.setData({ isPlaying: false });
+    if (!this.data.completed) {
+      this.completeCourse();
+    }
+  },
+
+  onTimeUpdate(e) {
+    this.setData({ currentTime: e.detail.currentTime });
   },
 
   // 完成课程

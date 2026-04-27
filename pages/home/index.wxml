@@ -156,8 +156,8 @@
   </view>
 
     <!-- 生理期（女性健康） -->
-    <view class="section-card period-card" bindtap="onRecordPeriod">
-      <view class="period-row">
+    <view class="section-card period-card">
+      <view class="period-row" bindtap="onRecordPeriod">
         <view class="period-icon">
           <t-icon name="heart" size="40rpx" color="#ff758f" />
         </view>
@@ -178,9 +178,12 @@
           </block>
         </view>
         <view class="period-action">
-          <text>{{periodData.isPeriod ? '记录' : '查看'}}</text>
+          <text>{{periodData.isPeriod ? '记录' : '添加'}}</text>
           <t-icon name="chevron-right" size="32rpx" color="#ccc" />
         </view>
+      </view>
+      <view class="period-history-link" wx:if="{{periodData.recordCount > 0}}" catchtap="onShowPeriodHistory">
+        <text>{{periodData.recordCount}} 条历史记录 ›</text>
       </view>
     </view>
 
@@ -214,6 +217,31 @@
       <view class="period-modal-footer">
         <view class="period-modal-btn cancel" bindtap="onClosePeriodModal">取消</view>
         <view class="period-modal-btn confirm" bindtap="onSavePeriodRecord">{{editingRecordIndex >= 0 ? '更新' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录弹窗 -->
+  <view class="history-modal" wx:if="{{showPeriodHistory}}" catchtap="onClosePeriodHistory">
+    <view class="history-modal-content" catchtap="">
+      <view class="history-modal-header">
+        <view class="history-modal-title">生理期历史记录</view>
+        <view class="history-modal-close" bindtap="onClosePeriodHistory">✕</view>
+      </view>
+      <scroll-view class="history-list" scroll-y wx:if="{{periodHistory.length > 0}}">
+        <view class="history-item" wx:for="{{periodHistory}}" wx:key="startDate">
+          <view class="history-item-top">
+            <text class="history-date">{{item.startDate}} ~ {{item.endDate}}</text>
+            <text class="history-duration">持续 {{item.duration}} 天</text>
+          </view>
+          <view class="history-item-bottom">
+            <text class="history-edit" data-index="{{item.index}}" catchtap="onEditPeriodRecord">编辑</text>
+            <text class="history-delete" data-index="{{item.index}}" catchtap="onDeletePeriodRecord">删除</text>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="history-empty" wx:else>
+        <text>暂无历史记录</text>
       </view>
     </view>
   </view>

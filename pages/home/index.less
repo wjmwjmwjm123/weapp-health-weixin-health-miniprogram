@@ -484,6 +484,78 @@
         color: #999;
       }
     }
+
+    .period-history-link {
+      margin-top: 16rpx;
+      padding-top: 16rpx;
+      border-top: 1rpx solid rgba(255, 117, 143, 0.1);
+      text-align: center;
+      font-size: 24rpx;
+      color: #ff758f;
+    }
+  }
+}
+
+// 历史记录弹窗
+.history-modal {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; z-index: 999;
+  backdrop-filter: blur(4px);
+
+  .history-modal-content {
+    width: 680rpx;
+    max-height: 70vh;
+    background: #fff;
+    border-radius: 32rpx;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .history-modal-header {
+      padding: 40rpx 40rpx 20rpx;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+
+      .history-modal-title { font-size: 32rpx; font-weight: 700; color: #333; }
+      .history-modal-close { font-size: 36rpx; color: #ccc; padding: 8rpx; }
+    }
+
+    .history-list {
+      flex: 1;
+      padding: 0 32rpx;
+      overflow-y: auto;
+
+      .history-item {
+        padding: 24rpx 0;
+        border-bottom: 1rpx solid #f0f0f0;
+
+        &:last-child { border-bottom: none; }
+
+        .history-item-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          .history-date { font-size: 26rpx; color: #333; font-weight: 500; }
+          .history-duration { font-size: 22rpx; color: #ff758f; }
+        }
+
+        .history-item-bottom {
+          display: flex;
+          gap: 32rpx;
+          margin-top: 12rpx;
+          .history-edit { font-size: 24rpx; color: #667eea; }
+          .history-delete { font-size: 24rpx; color: #ff4444; }
+        }
+      }
+    }
+
+    .history-empty {
+      padding: 80rpx 40rpx;
+      text-align: center;
+      font-size: 26rpx;
+      color: #999;
+    }
   }
 }
 

@@ -1,8 +1,21 @@
 <view class="course-detail-container" wx:if="{{course}}">
   <view class="course-video">
-    <view class="video-placeholder">
+    <video
+      wx:if="{{course.videoUrl}}"
+      class="video-player"
+      src="{{course.videoUrl}}"
+      controls
+      show-center-play-btn="{{!isPlaying}}"
+      show-play-btn="{{false}}"
+      object-fit="contain"
+      bindplay="onPlay"
+      bindpause="onPause"
+      bindended="onEnded"
+      bindtimeupdate="onTimeUpdate"
+    />
+    <view class="video-placeholder" wx:else>
       <view class="play-icon">▶</view>
-      <text>视频播放区域</text>
+      <text>暂无视频资源</text>
     </view>
     <view class="video-info">
       <view class="video-title">{{course.title}}</view>

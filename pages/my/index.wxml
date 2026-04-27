@@ -79,35 +79,6 @@
     </view>
   </view>
 
-  <view class="module-card avatar-card" wx:if="{{isLoad}}">
-    <view class="module-header">
-      <view>
-        <view class="title">定制个人形象</view>
-        <view class="sub">结合 MBTI，生成专属卡通教练</view>
-      </view>
-      <view class="chip">{{mbtiProfile.type}}人格</view>
-    </view>
-    <view class="avatar-content">
-      <view class="avatar-figure">
-        <view class="figure-emoji">{{mbtiProfile.emoji}}</view>
-        <view class="figure-type">{{mbtiProfile.persona}}</view>
-        <view class="figure-tip">{{mbtiProfile.tip}}</view>
-      </view>
-      <view class="avatar-panel">
-        <view class="panel-text">
-          {{mbtiProfile.story}}
-        </view>
-        <view class="avatar-tags">
-          <view class="tag" wx:for="{{avatarThemes}}" wx:key="index">{{item}}</view>
-        </view>
-        <view class="avatar-actions">
-          <view class="ghost-btn" bindtap="onMBTITest">重新测一测</view>
-          <view class="primary-btn" bindtap="onCustomizeAvatar">生成形象</view>
-        </view>
-      </view>
-    </view>
-  </view>
-
   <view class="module-card points-card" wx:if="{{isLoad}}">
     <view class="module-header">
       <view>
@@ -194,26 +165,6 @@
       </view>
       <view class="live-btn" bindtap="onWatchLive">{{communityData.live.action}}</view>
     </view>
-  </view>
-
-  <view class="module-card recharge-card" wx:if="{{isLoad}}">
-    <view class="module-header">
-      <view class="title">充值中心</view>
-      <view class="sub">课程 · 食谱 · 设备一站购</view>
-    </view>
-    <view class="recharge-list">
-      <view class="recharge-item" wx:for="{{rechargeOptions}}" wx:key="title" data-title="{{item.title}}" bindtap="onRechargeOption">
-        <view class="recharge-info">
-          <view class="recharge-title">
-            <text class="tag" wx:if="{{item.tag}}">{{item.tag}}</text>
-            {{item.title}}
-          </view>
-          <view class="recharge-desc">{{item.desc}}</view>
-        </view>
-        <view class="recharge-price">￥{{item.price}}</view>
-      </view>
-    </view>
-    <view class="primary-btn full" bindtap="onRechargeCenter">前往充值</view>
   </view>
 
   <view class="module-card account-card">
