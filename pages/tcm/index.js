@@ -244,7 +244,7 @@ Page({
         title: '温阳艾灸',
         desc: '背部督脉+神阙温灸，提升气血循环，改善手脚冰冷。',
         duration: '40min',
-        seats: '今日余2席',
+        seats: '',
         tag: '线下',
       },
       {
@@ -252,7 +252,7 @@ Page({
         title: '草本足浴',
         desc: '黄芪+当归+桂枝配方，舒缓疲劳、助眠放松。',
         duration: '30min',
-        seats: '可预约',
+        seats: '',
         tag: '在家可做',
       },
       {
@@ -260,7 +260,7 @@ Page({
         title: '经络舒缓',
         desc: '肩颈刮痧+耳穴按压，释放久坐累积的紧绷感。',
         duration: '25min',
-        seats: '热门',
+        seats: '',
         tag: constitution,
       },
       {
@@ -268,7 +268,7 @@ Page({
         title: '肩颈拔罐+刮痧',
         desc: '肩胛、风池、夹脊组合，疏通僵硬筋膜，缓解久坐酸痛。',
         duration: '35min',
-        seats: '晚间余3席',
+        seats: '',
         tag: '筋膜舒缓',
       },
       {
@@ -276,7 +276,7 @@ Page({
         title: '淋巴排浊',
         desc: '腿部经络按压+红外热敷，配合香薰呼吸，改善下肢水肿。',
         duration: '45min',
-        seats: '可拼团',
+        seats: '',
         tag: '线下',
       },
     ];
@@ -409,7 +409,7 @@ Page({
         if (!pkg) return;
         wx.showModal({
           title: pkg.title,
-          content: `${pkg.desc}\n\n时长：${pkg.duration}\n预约：${pkg.seats}`,
+          content: `${pkg.desc}\n\n时长：${pkg.duration}`,
           confirmText: '去理疗',
           cancelText: '知道了',
           success: (res) => {

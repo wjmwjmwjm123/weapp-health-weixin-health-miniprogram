@@ -166,21 +166,4 @@
       <view class="live-btn" bindtap="onWatchLive">{{communityData.live.action}}</view>
     </view>
   </view>
-
-  <view class="module-card account-card">
-    <view class="module-header">
-      <view class="title">账号与服务</view>
-      <view class="sub">快速登录 · 资料管理 · 设置</view>
-    </view>
-    <view class="account-actions">
-      <view class="account-item" data-type="setting" bindtap="onGoSetting">
-        <view class="account-title">系统设置</view>
-        <view class="account-desc">缓存清理 · 通知开关 · 隐私管理</view>
-      </view>
-      <view class="account-item" data-type="service" bindtap="onContact">
-        <view class="account-title">联系客服</view>
-        <view class="account-desc">客服微信：Ksbsds-0 · 电话：15559219227</view>
-      </view>
-    </view>
-  </view>
 </view>

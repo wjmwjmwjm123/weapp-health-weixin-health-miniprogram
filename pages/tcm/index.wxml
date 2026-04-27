@@ -65,9 +65,6 @@
               <text class="therapy-duration">{{item.duration}}</text>
             </view>
           </view>
-          <view class="therapy-right">
-            <text class="therapy-seats">{{item.seats}}</text>
-          </view>
         </view>
       </view>
     </view>
