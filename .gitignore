@@ -12,3 +12,15 @@ $RECYCLE.BIN/
 
 # Node.js
 node_modules/
+
+# Generated npm packages (WeChat IDE build output)
+miniprogram_npm/
+
+# Environment variables (contains secrets)
+.env
+
+# Claude Code config
+.claude/
+
+# User uploaded files
+minip-server/static/avatars/
